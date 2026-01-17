@@ -1,13 +1,19 @@
 #include "StepperController.h"
+#include "Configuration.h"
 
-StepperController::StepperController(AccelStepper* stepperMotor, int stepsPerPos, String name) 
-    : motor_(stepperMotor), currentPosition_(0), stepsPerPosition_(stepsPerPos), motorName_(name) {
-    motor_->setMaxSpeed(1000);        // Steps per second
-    motor_->setAcceleration(2000);    // Steps per second²
+// Private implementation constants
+#define MIN_DIGIT              0
+#define MAX_DIGIT              9
+#define DIGITS_PER_WHEEL       10
+
+StepperController::StepperController(AccelStepper* stepperMotor, int stepsPerPos) 
+    : motor_(stepperMotor), currentPosition_(0), stepsPerPosition_(stepsPerPos) {
+    motor_->setMaxSpeed(MOTOR_MAX_SPEED);
+    motor_->setAcceleration(MOTOR_ACCELERATION);
 }
 
 void StepperController::moveToDigit(int targetDigit) {
-    if (targetDigit < 0 || targetDigit > 9) return;
+    if (targetDigit < MIN_DIGIT || targetDigit > MAX_DIGIT) return;
     
     // Calculate forward-only distance
     int forwardSteps;
@@ -16,7 +22,7 @@ void StepperController::moveToDigit(int targetDigit) {
         forwardSteps = (targetDigit - currentPosition_) * stepsPerPosition_;
     } else {
         // Wrap around (go past 9 back to target)
-        forwardSteps = ((10 - currentPosition_) + targetDigit) * stepsPerPosition_;
+        forwardSteps = ((DIGITS_PER_WHEEL - currentPosition_) + targetDigit) * stepsPerPosition_;
     }
     
     if (forwardSteps > 0) {
@@ -25,14 +31,6 @@ void StepperController::moveToDigit(int targetDigit) {
     currentPosition_ = targetDigit;
 }
 
-bool StepperController::isMoving() { 
-    return motor_->isRunning(); 
-}
-
 void StepperController::run() {
     motor_->run();
-}
-
-void StepperController::setCurrentPosition(int position) {
-    currentPosition_ = position;
 }

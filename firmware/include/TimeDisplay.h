@@ -16,7 +16,7 @@ public:
                 StepperController* hoursOnes,
                 StepperController* minutesTens,
                 StepperController* minutesOnes,
-                int enablePin = 8);
+                int enablePin);
     
     void initialize();
     void updateTime(int hours, int minutes);

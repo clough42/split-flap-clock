@@ -1,6 +1,7 @@
 #include "GPSProcessor.h"
 #include "TimeDisplay.h"
 #include "LEDController.h"
+#include "Configuration.h"
 
 GPSProcessor::GPSProcessor(int timezoneOffset, TimeDisplay* timeDisplay, LEDController* ledController, HardwareSerial* serial) 
     : timeDisplay_(timeDisplay), ledController_(ledController), serial_(serial),
@@ -8,7 +9,7 @@ GPSProcessor::GPSProcessor(int timezoneOffset, TimeDisplay* timeDisplay, LEDCont
 }
 
 void GPSProcessor::initialize() {
-    serial_->begin(9600);
+    serial_->begin(GPS_BAUD_RATE);
     Serial.println("GPS serial interface initialized at 9600 baud");
 }
 

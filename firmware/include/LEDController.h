@@ -9,7 +9,7 @@ private:
     bool ledState_;
     
 public:
-    LEDController(int pin = 13);
+    LEDController(int pin);
     
     void setStatus(bool on);
     void toggle();
