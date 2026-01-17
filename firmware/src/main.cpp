@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
+#include <IntervalTimer.h>
 
 // Include our new classes
 #include "StepperController.h"
@@ -25,17 +26,20 @@ StepperController motorMinutesTens(&minutesTens, STEPS_PER_POSITION, "Minutes-Te
 StepperController motorMinutesOnes(&minutesOnes, STEPS_PER_POSITION, "Minutes-Ones");
 
 // LED controller (no dependencies)
-LEDController ledController(13, 167);
+LEDController ledController(13);
 
 // Time display (depends on stepper controllers)
-TimeDisplay timeDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes);
+TimeDisplay timeDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, ENABLE_PIN);
 
 // GPS processor (depends on timeDisplay and ledController)
 GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &timeDisplay, &ledController, &Serial3);
 
-// Background GPS processing - called automatically when Serial3 receives data
-void serialEvent3() {
-    gpsProcessor.processIncomingData();
+// Interrupt timer for stepper motor control
+IntervalTimer stepperTimer;
+
+// Interrupt service routine - runs motors at consistent intervals
+void runSteppersISR() {
+    timeDisplay.runMotors();
 }
 
 void setup() {
@@ -46,18 +50,16 @@ void setup() {
     
     // Initialize components
     ledController.initialize();
+    timeDisplay.initialize();  // Now handles motor enable pin
     gpsProcessor.initialize();
-
-    // Initialize stepper motor enable pin (active low)
-    pinMode(ENABLE_PIN, OUTPUT);
-    digitalWrite(ENABLE_PIN, LOW);  // Enable all motors
     
-    Serial.println("Initialization complete");
+    // Start interrupt-driven stepper control at 5kHz (200μs interval)
+    stepperTimer.begin(runSteppersISR, 200);  // 200 microseconds = 5000 Hz
+    
+    Serial.println("Initialization complete - stepper control is interrupt-driven");
 }
 
 void loop() {
-    // Run stepper motors through the time display service
-    timeDisplay.runMotors();
-    
-    // GPS processing happens automatically in serialEvent3()
+    // Poll GPS processor for incoming data
+    gpsProcessor.processIncomingData();
 }

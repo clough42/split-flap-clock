@@ -3,9 +3,16 @@
 TimeDisplay::TimeDisplay(StepperController* hoursTens, 
                         StepperController* hoursOnes,
                         StepperController* minutesTens,
-                        StepperController* minutesOnes)
+                        StepperController* minutesOnes,
+                        int enablePin)
     : hoursTens_(hoursTens), hoursOnes_(hoursOnes), 
-      minutesTens_(minutesTens), minutesOnes_(minutesOnes) {
+      minutesTens_(minutesTens), minutesOnes_(minutesOnes), enablePin_(enablePin) {
+}
+
+void TimeDisplay::initialize() {
+    // Initialize shared motor enable pin (active low)
+    pinMode(enablePin_, OUTPUT);
+    digitalWrite(enablePin_, LOW);  // Enable all motors
 }
 
 void TimeDisplay::updateTime(int hours, int minutes) {

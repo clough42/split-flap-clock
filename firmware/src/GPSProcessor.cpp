@@ -92,7 +92,7 @@ void GPSProcessor::parseGPSTime(const String& nmea) {
                 
                 // Toggle LED to indicate successful GPS time parsing
                 if (ledController_) {
-                    ledController_->setStatus(true);
+                    ledController_->toggle();
                 }
                 
                 // Update stepper motors to display time
