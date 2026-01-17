@@ -47,10 +47,9 @@ void setup() {
     Serial.begin(115200);
     Serial.println("GPS Split-Flap Clock Started");
 
-    
     // Initialize components
     ledController.initialize();
-    timeDisplay.initialize();  // Now handles motor enable pin
+    timeDisplay.initialize();
     gpsProcessor.initialize();
     
     // Start interrupt-driven stepper control at 5kHz (200μs interval)
