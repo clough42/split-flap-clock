@@ -7,14 +7,12 @@ class LEDController {
 private:
     int ledPin_;
     bool ledState_;
-    unsigned long previousMillis_;
-    unsigned long blinkInterval_;
     
 public:
-    LEDController(int pin = 13, unsigned long interval = 167);
+    LEDController(int pin = 13);
     
-    void blink();
     void setStatus(bool on);
+    void toggle();
     void initialize();
 };
 
