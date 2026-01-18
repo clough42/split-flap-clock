@@ -9,6 +9,7 @@ struct TimeData {
     int localHours;
     int localMinutes;
     int localSeconds;
+    int satelliteCount;  // Number of satellites used in fix
     bool validTime;
 };
 

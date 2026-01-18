@@ -37,15 +37,29 @@ void GPSProcessor::processIncomingData() {
 }
 
 void GPSProcessor::parseGPSTime(const String& nmea) {
-    // Look for GPGGA sentences which contain time data
+    // Look for GPGGA sentences which contain time data and satellite count
     if (nmea.startsWith("$GPGGA") || nmea.startsWith("$GNGGA")) {
-        // Split the sentence by commas
-        int firstComma = nmea.indexOf(',');
-        int secondComma = nmea.indexOf(',', firstComma + 1);
+        // GPGGA format: $GPGGA,time,lat,latNS,lon,lonEW,quality,numSV,HDOP,alt,altUnits,sep,sepUnits,diffAge,diffStation*checksum
+        // We want: time (field 1) and numSV (field 7 - number of satellites)
         
-        if (firstComma != -1 && secondComma != -1) {
-            // Extract time field (between first and second comma)
-            String timeStr = nmea.substring(firstComma + 1, secondComma);
+        // Split the sentence by commas
+        int commaPositions[15];  // Store positions of first 15 commas
+        int commaCount = 0;
+        
+        for (unsigned int i = 0; i < nmea.length() && commaCount < 15; i++) {
+            if (nmea.charAt(i) == ',') {
+                commaPositions[commaCount] = i;
+                commaCount++;
+            }
+        }
+        
+        if (commaCount >= 7) {
+            // Extract time field (field 1)
+            String timeStr = nmea.substring(commaPositions[0] + 1, commaPositions[1]);
+            
+            // Extract satellite count (field 7)
+            String satCountStr = nmea.substring(commaPositions[6] + 1, commaPositions[7]);
+            int satelliteCount = satCountStr.toInt();
             
             if (timeStr.length() >= 6) {
                 // Parse HHMMSS.SS format
@@ -111,6 +125,7 @@ void GPSProcessor::parseGPSTime(const String& nmea) {
                     TimeData timeData = {
                         utcHours, utcMinutes, utcSeconds,
                         localHours, utcMinutes, utcSeconds,  // Note: using utcMinutes for local minutes too
+                        satelliteCount,
                         true
                     };
                     displayController_->updateTime(timeData);
