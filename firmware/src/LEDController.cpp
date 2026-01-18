@@ -17,3 +17,7 @@ void LEDController::toggle() {
     ledState_ = !ledState_;
     digitalWrite(ledPin_, ledState_);
 }
+
+bool LEDController::getCurrentState() {
+    return ledState_;
+}

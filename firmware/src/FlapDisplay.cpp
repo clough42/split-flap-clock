@@ -1,6 +1,6 @@
-#include "TimeDisplay.h"
+#include "FlapDisplay.h"
 
-TimeDisplay::TimeDisplay(StepperController* hoursTens, 
+FlapDisplay::FlapDisplay(StepperController* hoursTens, 
                         StepperController* hoursOnes,
                         StepperController* minutesTens,
                         StepperController* minutesOnes,
@@ -9,20 +9,20 @@ TimeDisplay::TimeDisplay(StepperController* hoursTens,
       minutesTens_(minutesTens), minutesOnes_(minutesOnes), enablePin_(enablePin) {
 }
 
-void TimeDisplay::initialize() {
+void FlapDisplay::initialize() {
     // Initialize shared motor enable pin (active low)
     pinMode(enablePin_, OUTPUT);
     digitalWrite(enablePin_, LOW);  // Enable all motors
 }
 
-void TimeDisplay::updateTime(int hours, int minutes) {
+void FlapDisplay::updateTime(int hours, int minutes) {
     hoursTens_->moveToDigit(hours / 10);
     hoursOnes_->moveToDigit(hours % 10);
     minutesTens_->moveToDigit(minutes / 10);
     minutesOnes_->moveToDigit(minutes % 10);
 }
 
-void TimeDisplay::runMotors() {
+void FlapDisplay::runMotors() {
     hoursTens_->run();
     hoursOnes_->run();
     minutesTens_->run();

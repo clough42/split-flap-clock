@@ -7,9 +7,10 @@
 
 // Include our new classes
 #include "StepperController.h"
-#include "TimeDisplay.h"
+#include "FlapDisplay.h"
 #include "GPSProcessor.h"
 #include "LEDController.h"
+#include "TFTDisplay.h"
 
 // Hardware instances - these will be injected into our controllers
 AccelStepper hoursTens(AccelStepper::DRIVER, HOURS_TENS_STEP_PIN, HOURS_TENS_DIR_PIN);
@@ -26,18 +27,21 @@ StepperController motorMinutesOnes(&minutesOnes, STEPS_PER_POSITION);
 // LED controller (no dependencies)
 LEDController ledController(LED_PIN);
 
-// Time display (depends on stepper controllers)
-TimeDisplay timeDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, ENABLE_PIN);
+// Flap display (depends on stepper controllers)
+FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, ENABLE_PIN);
 
-// GPS processor (depends on timeDisplay and ledController)
-GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &timeDisplay, &ledController, &Serial3);
+// TFT Display controller
+TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN, TOUCH_CS_PIN, TOUCH_IRQ_PIN);
+
+// GPS processor (depends on flapDisplay and ledController)
+GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &flapDisplay, &ledController, &Serial3);
 
 // Interrupt timer for stepper motor control
 IntervalTimer stepperTimer;
 
 // Interrupt service routine - runs motors at consistent intervals
 void runSteppersISR() {
-    timeDisplay.runMotors();
+    flapDisplay.runMotors();
 }
 
 void setup() {
@@ -47,8 +51,12 @@ void setup() {
 
     // Initialize components
     ledController.initialize();
-    timeDisplay.initialize();
+    flapDisplay.initialize();
+    tftDisplay.initialize();
     gpsProcessor.initialize();
+    
+    // Wire TFT display to GPS processor
+    gpsProcessor.setDisplayController(&tftDisplay);
     
     // Start interrupt-driven stepper control at 5kHz (200μs interval)
     stepperTimer.begin(runSteppersISR, STEPPER_ISR_INTERVAL_US);  // 200 microseconds = 5000 Hz
@@ -59,4 +67,7 @@ void setup() {
 void loop() {
     // Poll GPS processor for incoming data
     gpsProcessor.processIncomingData();
+    
+    // Handle touch screen interactions
+    tftDisplay.handleTouch();
 }

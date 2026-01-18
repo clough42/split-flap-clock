@@ -1,9 +1,10 @@
-#ifndef TIME_DISPLAY_H
-#define TIME_DISPLAY_H
+#ifndef FLAP_DISPLAY_H
+#define FLAP_DISPLAY_H
 
+#include <Arduino.h>
 #include "StepperController.h"
 
-class TimeDisplay {
+class FlapDisplay {
 private:
     StepperController* hoursTens_;
     StepperController* hoursOnes_;
@@ -12,7 +13,7 @@ private:
     int enablePin_;
     
 public:
-    TimeDisplay(StepperController* hoursTens, 
+    FlapDisplay(StepperController* hoursTens, 
                 StepperController* hoursOnes,
                 StepperController* minutesTens,
                 StepperController* minutesOnes,
@@ -23,4 +24,4 @@ public:
     void runMotors();
 };
 
-#endif // TIME_DISPLAY_H
+#endif // FLAP_DISPLAY_H

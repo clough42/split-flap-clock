@@ -1,11 +1,16 @@
 #include "GPSProcessor.h"
-#include "TimeDisplay.h"
+#include "FlapDisplay.h"
 #include "LEDController.h"
+#include "TFTDisplay.h"
 #include "Configuration.h"
 
-GPSProcessor::GPSProcessor(int timezoneOffset, TimeDisplay* timeDisplay, LEDController* ledController, HardwareSerial* serial) 
-    : timeDisplay_(timeDisplay), ledController_(ledController), serial_(serial),
+GPSProcessor::GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, LEDController* ledController, HardwareSerial* serial) 
+    : timeDisplay_(timeDisplay), ledController_(ledController), displayController_(nullptr), serial_(serial),
       gpsBuffer_(""), timezoneOffsetHours_(timezoneOffset) {
+}
+
+void GPSProcessor::setDisplayController(TFTDisplay* displayController) {
+    displayController_ = displayController;
 }
 
 void GPSProcessor::initialize() {
@@ -99,6 +104,16 @@ void GPSProcessor::parseGPSTime(const String& nmea) {
                 // Update stepper motors to display time
                 if (timeDisplay_) {
                     timeDisplay_->updateTime(localHours, utcMinutes);
+                }
+                
+                // Update TFT display with time data
+                if (displayController_) {
+                    TimeData timeData = {
+                        utcHours, utcMinutes, utcSeconds,
+                        localHours, utcMinutes, utcSeconds,  // Note: using utcMinutes for local minutes too
+                        true
+                    };
+                    displayController_->updateTime(timeData);
                 }
             }
         }

@@ -16,8 +16,20 @@
 #define MINUTES_ONES_DIR_PIN    7
 
 // Control Pins
-#define ENABLE_PIN              8       // Active low - enables all stepper motors
-#define LED_PIN                 13      // Onboard LED for GPS status
+#define ENABLE_PIN              18      // Active low - enables all stepper motors
+#define LED_PIN                 23      // External LED for GPS status (pin 13 reserved for SPI)
+
+// TFT Display Pin Assignments (ILI9341)
+#define TFT_CS_PIN              10      // TFT chip select
+#define TFT_DC_PIN              9       // TFT data/command
+#define TFT_RST_PIN             255     // TFT reset (255 = not used)
+#define TFT_MOSI_PIN            11      // Hardware SPI MOSI
+#define TFT_MISO_PIN            12      // Hardware SPI MISO  
+#define TFT_SCK_PIN             13      // Hardware SPI SCK (must be pin 13 for Teensy 4.0)
+
+// Touch Screen Pin Assignments
+#define TOUCH_CS_PIN            8       // Touch chip select
+#define TOUCH_IRQ_PIN           17      // Touch interrupt (custom)
 
 // ============================================================================
 // MOTOR CONFIGURATION

@@ -14,6 +14,7 @@ public:
     void setStatus(bool on);
     void toggle();
     void initialize();
+    bool getCurrentState(); // Get current LED state
 };
 
 #endif // LED_CONTROLLER_H
