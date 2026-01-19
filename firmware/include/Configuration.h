@@ -37,18 +37,18 @@
 // ============================================================================
 #define STEPS_PER_POSITION      160     // 200 * 8 microsteps / 10 positions
 #define MOTOR_MAX_SPEED         1000    // Steps per second
-#define MOTOR_ACCELERATION      2000    // Steps per second²
+#define MOTOR_ACCELERATION      10000   // Steps per second²
 
 // ============================================================================
 // COMMUNICATION SETTINGS
 // ============================================================================
 #define SERIAL_BAUD_RATE        115200  // Console serial port baud rate
-#define GPS_BAUD_RATE          9600    // GPS serial port baud rate
+#define GPS_BAUD_RATE           9600    // GPS serial port baud rate
 
 // ============================================================================
 // SYSTEM TIMING
 // ============================================================================
-#define STEPPER_ISR_INTERVAL_US 200     // 200 microseconds = 5kHz interrupt rate
+#define STEPPER_ISR_INTERVAL_US 100     // 100 microseconds = 10kHz interrupt rate
 
 // ============================================================================
 // APPLICATION CONFIGURATION

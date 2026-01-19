@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "StepperController.h"
+#include "TimeData.h"
 
 class FlapDisplay {
 private:
@@ -22,7 +23,7 @@ public:
                 int debugPin);
     
     void initialize();
-    void updateTime(int hours, int minutes);
+    void updateTime(const TimeData& timeData);
     void runMotors();
 };
 

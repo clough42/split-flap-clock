@@ -97,7 +97,7 @@ void GPSProcessor::processGPSData() {
             
             // Update stepper motors
             if (timeDisplay_) {
-                timeDisplay_->updateTime(localHours, utcMinutes);
+                timeDisplay_->updateTime(timeData);
             }
         } else {
             // GPS data not valid yet, but show satellite status

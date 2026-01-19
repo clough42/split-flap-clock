@@ -20,11 +20,14 @@ void FlapDisplay::initialize() {
     digitalWrite(debugPin_, LOW);  // Start low
 }
 
-void FlapDisplay::updateTime(int hours, int minutes) {
-    hoursTens_->moveToDigit(hours / 10);
-    hoursOnes_->moveToDigit(hours % 10);
-    minutesTens_->moveToDigit(minutes / 10);
-    minutesOnes_->moveToDigit(minutes % 10);
+void FlapDisplay::updateTime(const TimeData& timeData) {
+    // Only update if time is valid
+    if (timeData.validTime) {
+        hoursTens_->moveToDigit(timeData.localHours / 10);
+        hoursOnes_->moveToDigit(timeData.localHours % 10);
+        minutesTens_->moveToDigit(timeData.localMinutes / 10);
+        minutesOnes_->moveToDigit(timeData.localMinutes % 10);
+    }
 }
 
 void FlapDisplay::runMotors() {
