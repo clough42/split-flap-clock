@@ -11,6 +11,7 @@ struct TimeData {
     int localSeconds;
     int satelliteCount;  // Number of satellites used in fix
     bool validTime;
+    const char* signalStrength;  // Signal quality assessment
 };
 
 #endif // TIME_DATA_H

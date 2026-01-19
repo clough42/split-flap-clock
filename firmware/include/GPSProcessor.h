@@ -2,6 +2,7 @@
 #define GPS_PROCESSOR_H
 
 #include <Arduino.h>
+#include <TinyGPS++.h>
 #include "TimeData.h"
 
 // Forward declarations
@@ -10,22 +11,25 @@ class LEDController;
 class TFTDisplay;
 
 class GPSProcessor {
-private:
-    FlapDisplay* timeDisplay_;
-    LEDController* ledController_;
-    TFTDisplay* displayController_;
-    HardwareSerial* serial_;
-    String gpsBuffer_;
-    int timezoneOffsetHours_;
-    
-    void parseGPSTime(const String& nmea);
-    
 public:
     GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, LEDController* ledController, HardwareSerial* serial);
     
     void initialize();
     void processIncomingData();
     void setDisplayController(TFTDisplay* displayController);
+    
+    // Signal strength assessment
+    const char* getSignalStrength(double hdop, int satellites);
+
+private:
+    FlapDisplay* timeDisplay_;
+    LEDController* ledController_;
+    TFTDisplay* displayController_;
+    HardwareSerial* serial_;
+    TinyGPSPlus gps_;  // TinyGPS++ object
+    int timezoneOffsetHours_;
+    
+    void processGPSData();  // Process parsed GPS data from TinyGPS++
 };
 
 #endif // GPS_PROCESSOR_H

@@ -4,8 +4,8 @@
 
 TFTDisplay::TFTDisplay(int tftCS, int tftDC, int tftRST, int touchCS, int touchIRQ) 
     : tft_(tftCS, tftDC, tftRST), touch_(touchCS, touchIRQ) {
-    // Initialize time data
-    lastDisplayedTime_ = {0, 0, 0, 0, 0, 0, 0, false};
+    // Initialize time data with safe defaults
+    lastDisplayedTime_ = {0, 0, 0, 0, 0, 0, 0, false, "NO SIGNAL"};
     lastUpdateTime_ = 0;
 }
 
@@ -46,6 +46,14 @@ void TFTDisplay::drawBackground() {
 }
 
 bool TFTDisplay::timeChanged(const TimeData& newTime) {
+    // Safe string comparison with null checks
+    bool signalChanged = false;
+    if (newTime.signalStrength != nullptr && lastDisplayedTime_.signalStrength != nullptr) {
+        signalChanged = (strcmp(newTime.signalStrength, lastDisplayedTime_.signalStrength) != 0);
+    } else if (newTime.signalStrength != lastDisplayedTime_.signalStrength) {
+        signalChanged = true; // One is null, the other isn't
+    }
+    
     return (newTime.utcHours != lastDisplayedTime_.utcHours ||
             newTime.utcMinutes != lastDisplayedTime_.utcMinutes ||
             newTime.utcSeconds != lastDisplayedTime_.utcSeconds ||
@@ -53,7 +61,8 @@ bool TFTDisplay::timeChanged(const TimeData& newTime) {
             newTime.localMinutes != lastDisplayedTime_.localMinutes ||
             newTime.localSeconds != lastDisplayedTime_.localSeconds ||
             newTime.satelliteCount != lastDisplayedTime_.satelliteCount ||
-            newTime.validTime != lastDisplayedTime_.validTime);
+            newTime.validTime != lastDisplayedTime_.validTime ||
+            signalChanged);
 }
 
 void TFTDisplay::updateTime(const TimeData& timeData) {
@@ -91,25 +100,62 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
         tft_.printf("%02d:%02d:%02d", timeData.localHours, timeData.localMinutes, timeData.localSeconds);
         
         // Update status only if changed
-        if (!lastDisplayedTime_.validTime) {
+        if (!lastDisplayedTime_.validTime || timeData.satelliteCount != lastDisplayedTime_.satelliteCount || 
+            (timeData.signalStrength && lastDisplayedTime_.signalStrength && 
+             strcmp(timeData.signalStrength, lastDisplayedTime_.signalStrength) != 0)) {
             tft_.fillRect(20, 190, 280, 20, ILI9341_BLACK);
-            tft_.setTextColor(ILI9341_WHITE);
+            
+            // Color code based on signal strength
+            uint16_t statusColor = ILI9341_WHITE;
+            if (timeData.signalStrength) {
+                if (strcmp(timeData.signalStrength, "EXCELLENT") == 0) statusColor = ILI9341_GREEN;
+                else if (strcmp(timeData.signalStrength, "GOOD") == 0) statusColor = ILI9341_CYAN;
+                else if (strcmp(timeData.signalStrength, "MODERATE") == 0) statusColor = ILI9341_YELLOW;
+                else if (strcmp(timeData.signalStrength, "FAIR") == 0) statusColor = ILI9341_MAGENTA;
+                else if (strcmp(timeData.signalStrength, "POOR") == 0) statusColor = ILI9341_RED;
+            }
+            
+            tft_.setTextColor(statusColor);
             tft_.setTextSize(1);
             tft_.setCursor(20, 190);
-            tft_.printf("GPS Signal: ACTIVE (%d satellites)", timeData.satelliteCount);
+            if (timeData.signalStrength) {
+                tft_.printf("GPS: %s (%d satellites)", timeData.signalStrength, timeData.satelliteCount);
+            } else {
+                tft_.printf("GPS: UNKNOWN (%d satellites)", timeData.satelliteCount);
+            }
         }
     } else {
-        // Display "No GPS" message
+        // Display "No GPS" message but still show satellite count
         tft_.fillRect(20, 85, 280, 80, ILI9341_BLACK);
         tft_.setTextColor(ILI9341_RED);
         tft_.setTextSize(2);
         tft_.setCursor(20, 110);
         tft_.println("Waiting for GPS...");
         
-        tft_.setTextColor(ILI9341_WHITE);
+        // Always clear the GPS status line before writing new text
+        tft_.fillRect(20, 190, 280, 20, ILI9341_BLACK);
+        
+        // Color code based on signal strength  
+        uint16_t statusColor = ILI9341_WHITE;
+        if (timeData.signalStrength) {
+            if (strcmp(timeData.signalStrength, "NO SIGNAL") == 0) statusColor = ILI9341_RED;
+            else if (strcmp(timeData.signalStrength, "POOR") == 0) statusColor = ILI9341_RED;
+            else if (strcmp(timeData.signalStrength, "FAIR") == 0) statusColor = ILI9341_MAGENTA;
+            else if (strcmp(timeData.signalStrength, "MODERATE") == 0) statusColor = ILI9341_YELLOW;
+        }
+        
+        tft_.setTextColor(statusColor);
         tft_.setTextSize(1);
         tft_.setCursor(20, 190);
-        tft_.println("GPS Signal: SEARCHING");
+        if (timeData.signalStrength) {
+            if (timeData.satelliteCount > 0) {
+                tft_.printf("GPS: %s (%d satellites)", timeData.signalStrength, timeData.satelliteCount);
+            } else {
+                tft_.printf("GPS: %s", timeData.signalStrength);
+            }
+        } else {
+            tft_.printf("GPS: ACQUIRING (%d satellites)", timeData.satelliteCount);
+        }
     }
     
     lastDisplayedTime_ = timeData;
