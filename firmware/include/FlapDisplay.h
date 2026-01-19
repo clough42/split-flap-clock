@@ -11,13 +11,15 @@ private:
     StepperController* minutesTens_;
     StepperController* minutesOnes_;
     int enablePin_;
+    int debugPin_;  // Pin 22 for timing measurement
     
 public:
     FlapDisplay(StepperController* hoursTens, 
                 StepperController* hoursOnes,
                 StepperController* minutesTens,
                 StepperController* minutesOnes,
-                int enablePin);
+                int enablePin,
+                int debugPin);
     
     void initialize();
     void updateTime(int hours, int minutes);

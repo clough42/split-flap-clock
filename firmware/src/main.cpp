@@ -28,7 +28,7 @@ StepperController motorMinutesOnes(&minutesOnes, STEPS_PER_POSITION);
 LEDController ledController(LED_PIN);
 
 // Flap display (depends on stepper controllers)
-FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, ENABLE_PIN);
+FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, ENABLE_PIN, DEBUG_PIN);
 
 // TFT Display controller
 TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN, TOUCH_CS_PIN, TOUCH_IRQ_PIN);

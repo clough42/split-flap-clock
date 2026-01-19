@@ -18,6 +18,7 @@
 // Control Pins
 #define ENABLE_PIN              18      // Active low - enables all stepper motors
 #define LED_PIN                 23      // External LED for GPS status (pin 13 reserved for SPI)
+#define DEBUG_PIN               22      // Debug timing pin for runMotors() measurement
 
 // TFT Display Pin Assignments (ILI9341)
 #define TFT_CS_PIN              10      // TFT chip select

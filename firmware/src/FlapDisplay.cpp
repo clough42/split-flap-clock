@@ -4,15 +4,20 @@ FlapDisplay::FlapDisplay(StepperController* hoursTens,
                         StepperController* hoursOnes,
                         StepperController* minutesTens,
                         StepperController* minutesOnes,
-                        int enablePin)
+                        int enablePin,
+                        int debugPin)
     : hoursTens_(hoursTens), hoursOnes_(hoursOnes), 
-      minutesTens_(minutesTens), minutesOnes_(minutesOnes), enablePin_(enablePin) {
+      minutesTens_(minutesTens), minutesOnes_(minutesOnes), enablePin_(enablePin), debugPin_(debugPin) {
 }
 
 void FlapDisplay::initialize() {
     // Initialize shared motor enable pin (active low)
     pinMode(enablePin_, OUTPUT);
     digitalWrite(enablePin_, LOW);  // Enable all motors
+    
+    // Initialize debug pin for timing measurement
+    pinMode(debugPin_, OUTPUT);
+    digitalWrite(debugPin_, LOW);  // Start low
 }
 
 void FlapDisplay::updateTime(int hours, int minutes) {
@@ -23,8 +28,12 @@ void FlapDisplay::updateTime(int hours, int minutes) {
 }
 
 void FlapDisplay::runMotors() {
+    digitalWrite(debugPin_, HIGH);  // Start timing measurement
+    
     hoursTens_->run();
     hoursOnes_->run();
     minutesTens_->run();
     minutesOnes_->run();
+    
+    digitalWrite(debugPin_, LOW);   // End timing measurement
 }
