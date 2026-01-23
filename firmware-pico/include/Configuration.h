@@ -35,13 +35,13 @@
 #define LED_PIN                 LED_BUILTIN  // Use Pico built-in LED (GPIO 25)
 #define DEBUG_PIN               15      // Debug timing pin for runMotors() measurement
 
-// TFT Display Pin Assignments (ILI9341)
+// TFT Display Pin Assignments (ILI9341) - Default SPI0 pins
 #define TFT_CS_PIN              17      // TFT chip select
 #define TFT_DC_PIN              20      // TFT data/command
 #define TFT_RST_PIN             255     // TFT reset (255 = not used)
-#define TFT_MOSI_PIN            9       // Hardware SPI MOSI
-#define TFT_MISO_PIN            21      // Hardware SPI MISO  
-#define TFT_SCK_PIN             18      // Hardware SPI SCK (must be pin 13 for Teensy 4.0)
+#define TFT_MOSI_PIN            19      // Hardware SPI MOSI (default)
+#define TFT_MISO_PIN            16      // Hardware SPI MISO (default)
+#define TFT_SCK_PIN             18      // Hardware SPI SCK
 
 // Touch Screen Pin Assignments
 #define TOUCH_CS_PIN            21      // Touch chip select

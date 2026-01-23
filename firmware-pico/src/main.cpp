@@ -1,9 +1,12 @@
 #include <Arduino.h>
 
-// Include configuration and classes
+// Include configuration
 #include "Configuration.h"
-#include "GPSProcessor.h"
+
+// Include our classes
+#include "StepperController.h"
 #include "FlapDisplay.h"
+#include "GPSProcessor.h"
 #include "LEDController.h"
 #include "TFTDisplay.h"
 
@@ -29,25 +32,24 @@ LEDController ledController(LED_PIN);
 // Flap display (depends on stepper controllers)
 FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, &motorSecondsTens, &motorSecondsOnes, ENABLE_PIN, DEBUG_PIN);
 
-TFTDisplay tftDisplay(10, 9, 8, 7, 6);  // Dummy pins
+TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN, TOUCH_CS_PIN, TOUCH_IRQ_PIN);
 
 // GPS processor with real dependencies
 GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &flapDisplay, &ledController, &Serial1);
 
 void setup() {
-    // Initialize console serial
+    // Initialize serial communication for console output
     Serial.begin(SERIAL_BAUD_RATE);
-    Serial.println("GPS Split-Flap Clock - RP2040 Port with GPSProcessor");
+    Serial.println("GPS Split-Flap Clock Started");
     
     // Initialize LED controller
     ledController.initialize();
     flapDisplay.initialize();
+    tftDisplay.initialize();
+    gpsProcessor.initialize();
     
     // Set TFT display controller
     gpsProcessor.setDisplayController(&tftDisplay);
-    
-    // Initialize GPS processor
-    gpsProcessor.initialize();
     
     Serial.println("GPSProcessor initialized. LED will toggle when GPS gets valid time.");
 }
@@ -56,6 +58,10 @@ void loop() {
     // Process GPS data using GPSProcessor
     gpsProcessor.processIncomingData();
 
+    // Handle touch screen interactions
+    tftDisplay.handleTouch();
+
+    // Service the stepper motors
     flapDisplay.runMotors();
 
 }
