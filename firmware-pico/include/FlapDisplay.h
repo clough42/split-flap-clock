@@ -1,33 +1,34 @@
 #ifndef FLAP_DISPLAY_H
 #define FLAP_DISPLAY_H
 
+#include <Arduino.h>
+#include "StepperController.h"
 #include "TimeData.h"
 
 class FlapDisplay {
-public:
-    FlapDisplay() {}
+private:
+    StepperController* hoursTens_;
+    StepperController* hoursOnes_;
+    StepperController* minutesTens_;
+    StepperController* minutesOnes_;
+    StepperController* secondsTens_;
+    StepperController* secondsOnes_;
+    int enablePin_;
+    int debugPin_;  // Pin 22 for timing measurement
     
-    void updateTime(const TimeData& timeData) {
-        if (timeData.validTime) {
-            Serial.print("FLAP: Valid time - ");
-            Serial.print(timeData.localHours);
-            Serial.print(":");
-            if (timeData.localMinutes < 10) Serial.print("0");
-            Serial.print(timeData.localMinutes);
-            Serial.print(":");
-            if (timeData.localSeconds < 10) Serial.print("0");
-            Serial.print(timeData.localSeconds);
-            Serial.print(" (UTC ");
-            Serial.print(timeData.utcHours);
-            Serial.print(":");
-            if (timeData.utcMinutes < 10) Serial.print("0");
-            Serial.print(timeData.utcMinutes);
-            Serial.print(":");
-            if (timeData.utcSeconds < 10) Serial.print("0");
-            Serial.print(timeData.utcSeconds);
-            Serial.println(")");
-        }
-    }
+public:
+    FlapDisplay(StepperController* hoursTens, 
+                StepperController* hoursOnes,
+                StepperController* minutesTens,
+                StepperController* minutesOnes,
+                StepperController* secondsTens,
+                StepperController* secondsOnes,
+                int enablePin,
+                int debugPin);
+    
+    void initialize();
+    void updateTime(const TimeData& timeData);
+    void runMotors();
 };
 
 #endif // FLAP_DISPLAY_H

@@ -1,0 +1,48 @@
+#include "FlapDisplay.h"
+
+FlapDisplay::FlapDisplay(StepperController* hoursTens, 
+                        StepperController* hoursOnes,
+                        StepperController* minutesTens,
+                        StepperController* minutesOnes,
+                        StepperController* secondsTens,
+                        StepperController* secondsOnes,
+                        int enablePin,
+                        int debugPin)
+    : hoursTens_(hoursTens), hoursOnes_(hoursOnes), 
+      minutesTens_(minutesTens), minutesOnes_(minutesOnes), secondsTens_(secondsTens), secondsOnes_(secondsOnes), enablePin_(enablePin), debugPin_(debugPin) {
+}
+
+void FlapDisplay::initialize() {
+    // Initialize shared motor enable pin (active low)
+    pinMode(enablePin_, OUTPUT);
+    digitalWrite(enablePin_, LOW);  // Enable all motors
+    
+    // Initialize debug pin for timing measurement
+    pinMode(debugPin_, OUTPUT);
+    digitalWrite(debugPin_, LOW);  // Start low
+}
+
+void FlapDisplay::updateTime(const TimeData& timeData) {
+    // Only update if time is valid
+    if (timeData.validTime) {
+        hoursTens_->moveToDigit(timeData.localHours / 10);
+        hoursOnes_->moveToDigit(timeData.localHours % 10);
+        minutesTens_->moveToDigit(timeData.localMinutes / 10);
+        minutesOnes_->moveToDigit(timeData.localMinutes % 10);
+        secondsTens_->moveToDigit(timeData.localSeconds / 10);
+        secondsOnes_->moveToDigit(timeData.localSeconds % 10);
+    }
+}
+
+void FlapDisplay::runMotors() {
+    digitalWrite(debugPin_, HIGH);  // Start timing measurement
+    
+    hoursTens_->run();
+    hoursOnes_->run();
+    minutesTens_->run();
+    minutesOnes_->run();
+    secondsTens_->run();
+    secondsOnes_->run();
+    
+    digitalWrite(debugPin_, LOW);   // End timing measurement
+}
