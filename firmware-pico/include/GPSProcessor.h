@@ -13,27 +13,27 @@ class TFTDisplay;
 
 class GPSProcessor {
 public:
-    GPSProcessor(ConfigPersistence* config, FlapDisplay* timeDisplay, TFTDisplay* tftDisplay, LEDController* ledController, HardwareSerial* serial);
-    
+    GPSProcessor(ConfigPersistence& config, FlapDisplay& timeDisplay, TFTDisplay& tftDisplay, LEDController& ledController, HardwareSerial& serial);
+
     void initialize();
     void processIncomingData();
-    void setDisplayController(TFTDisplay* displayController);
-    
+    void setDisplayController(TFTDisplay& displayController);
+
     // Timezone offset management
     void incrementTimezoneOffset();  // Increment timezone offset (0-23, wrapping)
-    
+
     // Signal strength assessment
     const char* getSignalStrength(double hdop, int satellites);
 
 private:
-    FlapDisplay* timeDisplay_;
-    LEDController* ledController_;
-    TFTDisplay* displayController_;
-    HardwareSerial* serial_;
+    FlapDisplay& timeDisplay_;
+    LEDController& ledController_;
+    TFTDisplay& displayController_;
+    HardwareSerial& serial_;
     TinyGPSPlus gps_;  // TinyGPS++ object
-    ConfigPersistence* config_;
+    ConfigPersistence& config_;
     int timezoneOffsetHours_;
-    
+
     void processGPSData();  // Process parsed GPS data from TinyGPS++
 };
 

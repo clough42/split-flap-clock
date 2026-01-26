@@ -5,13 +5,13 @@
 
 class StepperController {
 private:
-    AccelStepper* motor_;
+    AccelStepper& motor_;
     int currentPosition_;  // 0-9
     int stepsPerPosition_;
-    
+
 public:
-    StepperController(AccelStepper* stepperMotor, int stepsPerPos);
-    
+    StepperController(AccelStepper& stepperMotor, int stepsPerPos);
+
     void moveToDigit(int targetDigit);
     void run();
 };

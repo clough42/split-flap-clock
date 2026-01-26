@@ -6,10 +6,10 @@
 #define MAX_DIGIT              9
 #define DIGITS_PER_WHEEL       10
 
-StepperController::StepperController(AccelStepper* stepperMotor, int stepsPerPos) 
+StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos)
     : motor_(stepperMotor), currentPosition_(0), stepsPerPosition_(stepsPerPos) {
-    motor_->setMaxSpeed(MOTOR_MAX_SPEED);
-    motor_->setAcceleration(MOTOR_ACCELERATION);
+    motor_.setMaxSpeed(MOTOR_MAX_SPEED);
+    motor_.setAcceleration(MOTOR_ACCELERATION);
 }
 
 void StepperController::moveToDigit(int targetDigit) {
@@ -26,11 +26,11 @@ void StepperController::moveToDigit(int targetDigit) {
     }
     
     if (forwardSteps > 0) {
-        motor_->move(forwardSteps);
+        motor_.move(forwardSteps);
     }
     currentPosition_ = targetDigit;
 }
 
 void StepperController::run() {
-    motor_->run();
+    motor_.run();
 }

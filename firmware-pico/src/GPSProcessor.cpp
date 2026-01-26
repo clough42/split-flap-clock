@@ -6,11 +6,11 @@
 #include "TFTDisplay.h"
 #include "Configuration.h"
 
-GPSProcessor::GPSProcessor(ConfigPersistence* config, FlapDisplay* timeDisplay, TFTDisplay* displayController, LEDController* ledController, HardwareSerial* serial) 
+GPSProcessor::GPSProcessor(ConfigPersistence& config, FlapDisplay& timeDisplay, TFTDisplay& displayController, LEDController& ledController, HardwareSerial& serial)
     : config_(config), timeDisplay_(timeDisplay), displayController_(displayController), ledController_(ledController), serial_(serial){
 }
 
-void GPSProcessor::setDisplayController(TFTDisplay* displayController) {
+void GPSProcessor::setDisplayController(TFTDisplay& displayController) {
     displayController_ = displayController;
 }
 
@@ -19,7 +19,7 @@ void GPSProcessor::incrementTimezoneOffset() {
     if (timezoneOffsetHours_ > 23) {
         timezoneOffsetHours_ = 0;
     }
-    config_->setTimezoneOffset(timezoneOffsetHours_);
+    config_.setTimezoneOffset(timezoneOffsetHours_);
 
     Serial.print("Timezone offset changed to: ");
     Serial.println(timezoneOffsetHours_);
@@ -28,15 +28,15 @@ void GPSProcessor::incrementTimezoneOffset() {
 }
 
 void GPSProcessor::initialize() {
-    serial_->begin(GPS_BAUD_RATE);
+    serial_.begin(GPS_BAUD_RATE);
     Serial.println("GPS serial interface initialized at 9600 baud");
 
-    timezoneOffsetHours_ = config_->getTimezoneOffset();
+    timezoneOffsetHours_ = config_.getTimezoneOffset();
 }
 
 void GPSProcessor::processIncomingData() {
-    while (serial_->available()) {
-        char gpsChar = serial_->read();
+    while (serial_.available()) {
+        char gpsChar = serial_.read();
         
         // Feed character to TinyGPS++ for parsing
         if (gps_.encode(gpsChar)) {
@@ -76,53 +76,47 @@ void GPSProcessor::processGPSData() {
     bool statusChanged = (satelliteCount != lastSatelliteCount) || (timeIsValid != lastTimeValid);
     
     // Always update display with current GPS status
-    if (displayController_) {
-        double hdop = gps_.hdop.hdop();
-        const char* signalStrength = getSignalStrength(hdop, satelliteCount);
-        TimeData timeData;
-        
-        if (timeIsValid) {
-            // Extract valid time components
-            int utcHours = gps_.time.hour();
-            int utcMinutes = gps_.time.minute();
-            int utcSeconds = gps_.time.second();
-            
-            // Calculate local time
-            int localHours = utcHours + timezoneOffsetHours_;
-            
-            // Handle day rollover
-            if (localHours < 0) {
-                localHours += 24;
-            } else if (localHours >= 24) {
-                localHours -= 24;
-            }
-            
-            // Populate time data with valid values
-            timeData = {
-                utcHours, utcMinutes, utcSeconds,
-                localHours, utcMinutes, utcSeconds,
-                satelliteCount,
-                true,
-                signalStrength
-            };
-            
-            // Toggle LED for valid GPS
-            if (ledController_) {
-                ledController_->toggle();
-            }
-            
-            // Update stepper motors
-            if (timeDisplay_) {
-                timeDisplay_->updateTime(timeData);
-            }
-        } else {
-            // GPS data not valid yet, but show satellite status
-            timeData = {0, 0, 0, 0, 0, 0, satelliteCount, false, signalStrength};
+    double hdop = gps_.hdop.hdop();
+    const char* signalStrength = getSignalStrength(hdop, satelliteCount);
+    TimeData timeData;
+
+    if (timeIsValid) {
+        // Extract valid time components
+        int utcHours = gps_.time.hour();
+        int utcMinutes = gps_.time.minute();
+        int utcSeconds = gps_.time.second();
+
+        // Calculate local time
+        int localHours = utcHours + timezoneOffsetHours_;
+
+        // Handle day rollover
+        if (localHours < 0) {
+            localHours += 24;
+        } else if (localHours >= 24) {
+            localHours -= 24;
         }
-        
-        // Always update display with current status
-        displayController_->updateTime(timeData);
+
+        // Populate time data with valid values
+        timeData = {
+            utcHours, utcMinutes, utcSeconds,
+            localHours, utcMinutes, utcSeconds,
+            satelliteCount,
+            true,
+            signalStrength
+        };
+
+        // Toggle LED for valid GPS
+        ledController_.toggle();
+
+        // Update stepper motors
+        timeDisplay_.updateTime(timeData);
+    } else {
+        // GPS data not valid yet, but show satellite status
+        timeData = {0, 0, 0, 0, 0, 0, satelliteCount, false, signalStrength};
     }
+
+    // Always update display with current status
+    displayController_.updateTime(timeData);
     
     // Only print status when something changes
     if (statusChanged) {

@@ -25,23 +25,23 @@ AccelStepper secondsTens(AccelStepper::DRIVER, SECONDS_TENS_STEP_PIN, SECONDS_TE
 AccelStepper secondsOnes(AccelStepper::DRIVER, SECONDS_ONES_STEP_PIN, SECONDS_ONES_DIR_PIN);
 
 // Controller instances - initialized directly in dependency order
-StepperController motorHoursTens(&hoursTens, STEPS_PER_POSITION);
-StepperController motorHoursOnes(&hoursOnes, STEPS_PER_POSITION);
-StepperController motorMinutesTens(&minutesTens, STEPS_PER_POSITION);
-StepperController motorMinutesOnes(&minutesOnes, STEPS_PER_POSITION);
-StepperController motorSecondsTens(&secondsTens, STEPS_PER_POSITION);
-StepperController motorSecondsOnes(&secondsOnes, STEPS_PER_POSITION);
+StepperController motorHoursTens(hoursTens, STEPS_PER_POSITION);
+StepperController motorHoursOnes(hoursOnes, STEPS_PER_POSITION);
+StepperController motorMinutesTens(minutesTens, STEPS_PER_POSITION);
+StepperController motorMinutesOnes(minutesOnes, STEPS_PER_POSITION);
+StepperController motorSecondsTens(secondsTens, STEPS_PER_POSITION);
+StepperController motorSecondsOnes(secondsOnes, STEPS_PER_POSITION);
 
 // LED controller (no dependencies)
 LEDController ledController(LED_PIN);
 
 // Flap display (depends on stepper controllers)
-FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, &motorSecondsTens, &motorSecondsOnes, ENABLE_PIN, DEBUG_PIN);
+FlapDisplay flapDisplay(motorHoursTens, motorHoursOnes, motorMinutesTens, motorMinutesOnes, motorSecondsTens, motorSecondsOnes, ENABLE_PIN, DEBUG_PIN);
 
 TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
 // GPS processor with real dependencies
-GPSProcessor gpsProcessor(&configPersistence, &flapDisplay, &tftDisplay, &ledController, &Serial1);
+GPSProcessor gpsProcessor(configPersistence, flapDisplay, tftDisplay, ledController, Serial1);
 
 // Timezone button with debouncing
 DebouncedButton timezoneButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS);
