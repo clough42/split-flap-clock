@@ -52,6 +52,9 @@ void setup() {
     SPI.setTX(TFT_MOSI_PIN);
     SPI.setSCK(TFT_SCK_PIN);
 
+    // Initialize timezone button with internal pullup (active low)
+    pinMode(TIMEZONE_BUTTON_PIN, INPUT_PULLUP);
+
     // Initialize LED controller
     ledController.initialize();
     flapDisplay.initialize();
@@ -65,6 +68,20 @@ void setup() {
 }
 
 void loop() {
+    // Handle timezone button with debouncing (active low)
+    static unsigned long lastButtonPress = 0;
+    static bool lastButtonState = HIGH;
+    bool currentButtonState = digitalRead(TIMEZONE_BUTTON_PIN);
+    
+    if (currentButtonState == LOW && lastButtonState == HIGH) {
+        unsigned long currentTime = millis();
+        if (currentTime - lastButtonPress >= BUTTON_DEBOUNCE_MS) {
+            gpsProcessor.incrementTimezoneOffset();
+            lastButtonPress = currentTime;
+        }
+    }
+    lastButtonState = currentButtonState;
+
     // Process GPS data using GPSProcessor
     gpsProcessor.processIncomingData();
 

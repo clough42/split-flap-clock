@@ -46,8 +46,10 @@
 #define ENABLE_PIN              14      // Active low - enables all stepper motors
 #define LED_PIN                 LED_BUILTIN  // Use Pico built-in LED (GPIO 25)
 #define DEBUG_PIN               15      // Debug timing pin for runMotors() measurement
+#define TIMEZONE_BUTTON_PIN     21      // Timezone offset button (active low with internal pullup)
 
-
+// Button Debounce Configuration
+#define BUTTON_DEBOUNCE_MS      200     // Debounce time in milliseconds
 
 // ============================================================================
 // MOTOR CONFIGURATION

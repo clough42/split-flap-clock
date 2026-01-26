@@ -13,6 +13,15 @@ void GPSProcessor::setDisplayController(TFTDisplay* displayController) {
     displayController_ = displayController;
 }
 
+void GPSProcessor::incrementTimezoneOffset() {
+    timezoneOffsetHours_++;
+    if (timezoneOffsetHours_ > 23) {
+        timezoneOffsetHours_ = 0;
+    }
+    Serial.print("Timezone offset changed to: ");
+    Serial.println(timezoneOffsetHours_);
+}
+
 void GPSProcessor::initialize() {
     serial_->begin(GPS_BAUD_RATE);
     Serial.println("GPS serial interface initialized at 9600 baud");

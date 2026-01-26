@@ -18,6 +18,10 @@ public:
     void processIncomingData();
     void setDisplayController(TFTDisplay* displayController);
     
+    // Timezone offset management
+    void incrementTimezoneOffset();  // Increment timezone offset (0-23, wrapping)
+    int getTimezoneOffset() const { return timezoneOffsetHours_; }
+    
     // Signal strength assessment
     const char* getSignalStrength(double hdop, int satellites);
 
