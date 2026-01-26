@@ -78,9 +78,6 @@ void loop() {
     // Process GPS data using GPSProcessor
     gpsProcessor.processIncomingData();
 
-    // Handle touch screen interactions
-    tftDisplay.handleTouch();
-
     // Service the stepper motors
     flapDisplay.runMotors();
 

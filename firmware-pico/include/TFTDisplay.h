@@ -24,8 +24,6 @@ public:
     
     void initialize();
     void updateTime(const TimeData& timeData);
-    void handleTouch();
-    bool isTouchPressed();
 };
 
 #endif // TFT_DISPLAY_H

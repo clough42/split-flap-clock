@@ -123,11 +123,3 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
         lastDisplayedTime_ = timeData;
     }
 }
-
-void TFTDisplay::handleTouch() {
-    // Touch disabled
-}
-
-bool TFTDisplay::isTouchPressed() {
-    return false;
-}
