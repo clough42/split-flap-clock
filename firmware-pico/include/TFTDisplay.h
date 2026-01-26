@@ -17,6 +17,7 @@ private:
     void drawTimeDisplay();
     void drawBackground();
     bool timeChanged(const TimeData& newTime);
+    bool statusChanged(const TimeData& newTime);
     
 public:
     TFTDisplay(int tftCS, int tftDC, int tftRST);
