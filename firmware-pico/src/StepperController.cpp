@@ -10,6 +10,7 @@ StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos
     : motor_(stepperMotor), currentPosition_(0), stepsPerPosition_(stepsPerPos) {
     motor_.setMaxSpeed(MOTOR_MAX_SPEED);
     motor_.setAcceleration(MOTOR_ACCELERATION);
+    motor_.setPinsInverted(MOTOR_INVERT_DIRECTION);
 }
 
 void StepperController::moveToDigit(int targetDigit) {

@@ -50,10 +50,12 @@
 #define WATCHDOG_TIMEOUT_MS     4000    // Watchdog timer timeout in milliseconds
 
 // ============================================================================
+
 // MOTOR CONFIGURATION
 // ============================================================================
 #define STEPS_PER_POSITION      160     // 200 * 8 microsteps / 10 positions
 #define MOTOR_MAX_SPEED         1000    // Steps per second
 #define MOTOR_ACCELERATION      10000   // Steps per second²
+#define MOTOR_INVERT_DIRECTION  true     // Set to true to invert stepper direction, false for normal
 
 #endif // CONFIGURATION_H
