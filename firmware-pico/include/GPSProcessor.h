@@ -9,10 +9,11 @@
 class FlapDisplay;
 class LEDController;
 class TFTDisplay;
+#include "ConfigPersistence.h"
 
 class GPSProcessor {
 public:
-    GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, TFTDisplay* tftDisplay,LEDController* ledController, HardwareSerial* serial);
+    GPSProcessor(ConfigPersistence* config, FlapDisplay* timeDisplay, TFTDisplay* tftDisplay, LEDController* ledController, HardwareSerial* serial);
     
     void initialize();
     void processIncomingData();
@@ -20,7 +21,6 @@ public:
     
     // Timezone offset management
     void incrementTimezoneOffset();  // Increment timezone offset (0-23, wrapping)
-    int getTimezoneOffset() const { return timezoneOffsetHours_; }
     
     // Signal strength assessment
     const char* getSignalStrength(double hdop, int satellites);
@@ -31,6 +31,7 @@ private:
     TFTDisplay* displayController_;
     HardwareSerial* serial_;
     TinyGPSPlus gps_;  // TinyGPS++ object
+    ConfigPersistence* config_;
     int timezoneOffsetHours_;
     
     void processGPSData();  // Process parsed GPS data from TinyGPS++

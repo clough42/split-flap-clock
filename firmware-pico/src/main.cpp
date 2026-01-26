@@ -11,6 +11,10 @@
 #include "LEDController.h"
 #include "TFTDisplay.h"
 #include "DebouncedButton.h"
+#include "ConfigPersistence.h"
+
+// Configuration persistence
+ConfigPersistence configPersistence;
 
 // Hardware instances - these will be injected into our controllers
 AccelStepper hoursTens(AccelStepper::DRIVER, HOURS_TENS_STEP_PIN, HOURS_TENS_DIR_PIN);
@@ -37,7 +41,7 @@ FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &mo
 TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
 // GPS processor with real dependencies
-GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &flapDisplay, &tftDisplay, &ledController, &Serial1);
+GPSProcessor gpsProcessor(&configPersistence, &flapDisplay, &tftDisplay, &ledController, &Serial1);
 
 // Timezone button with debouncing
 DebouncedButton timezoneButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS);
@@ -56,7 +60,8 @@ void setup() {
     SPI.setTX(TFT_MOSI_PIN);
     SPI.setSCK(TFT_SCK_PIN);
 
-    // Initialize LED controller
+    // Initialize everything
+    configPersistence.initialize();
     timezoneButton.initialize();
     ledController.initialize();
     flapDisplay.initialize();

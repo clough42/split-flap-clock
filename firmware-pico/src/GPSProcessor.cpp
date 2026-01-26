@@ -1,12 +1,13 @@
+#include <EEPROM.h>
+
 #include "GPSProcessor.h"
 #include "FlapDisplay.h"
 #include "LEDController.h"
 #include "TFTDisplay.h"
 #include "Configuration.h"
 
-GPSProcessor::GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, TFTDisplay* displayController, LEDController* ledController, HardwareSerial* serial) 
-    : timeDisplay_(timeDisplay), displayController_(displayController), ledController_(ledController), serial_(serial),
-      timezoneOffsetHours_(timezoneOffset) {
+GPSProcessor::GPSProcessor(ConfigPersistence* config, FlapDisplay* timeDisplay, TFTDisplay* displayController, LEDController* ledController, HardwareSerial* serial) 
+    : config_(config), timeDisplay_(timeDisplay), displayController_(displayController), ledController_(ledController), serial_(serial){
 }
 
 void GPSProcessor::setDisplayController(TFTDisplay* displayController) {
@@ -18,6 +19,8 @@ void GPSProcessor::incrementTimezoneOffset() {
     if (timezoneOffsetHours_ > 23) {
         timezoneOffsetHours_ = 0;
     }
+    config_->setTimezoneOffset(timezoneOffsetHours_);
+
     Serial.print("Timezone offset changed to: ");
     Serial.println(timezoneOffsetHours_);
 
@@ -27,6 +30,8 @@ void GPSProcessor::incrementTimezoneOffset() {
 void GPSProcessor::initialize() {
     serial_->begin(GPS_BAUD_RATE);
     Serial.println("GPS serial interface initialized at 9600 baud");
+
+    timezoneOffsetHours_ = config_->getTimezoneOffset();
 }
 
 void GPSProcessor::processIncomingData() {
