@@ -47,6 +47,9 @@ GPSProcessor gpsProcessor(configPersistence, flapDisplay, tftDisplay, ledControl
 DebouncedButton timezoneButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS);
 
 void setup() {
+    // initialize the hardware watchdog timer
+    rp2040.wdt_begin(WATCHDOG_TIMEOUT_MS);
+
     // Initialize serial communication for console output
     Serial.begin(SERIAL_BAUD_RATE);
     Serial.println("GPS Split-Flap Clock Started");
@@ -85,6 +88,9 @@ void loop() {
 
     // Process GPS data using GPSProcessor
     gpsProcessor.processIncomingData();
+
+    // let the watchdog know we're alive
+    rp2040.wdt_reset();
 }
 
 void loop1() {

@@ -46,6 +46,9 @@
 // Button Debounce Configuration
 #define BUTTON_DEBOUNCE_MS      200     // Debounce time in milliseconds
 
+// Watchdog Timer Configuration
+#define WATCHDOG_TIMEOUT_MS     4000    // Watchdog timer timeout in milliseconds
+
 // ============================================================================
 // MOTOR CONFIGURATION
 // ============================================================================
