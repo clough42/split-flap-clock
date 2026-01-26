@@ -10,6 +10,7 @@
 #include "GPSProcessor.h"
 #include "LEDController.h"
 #include "TFTDisplay.h"
+#include "DebouncedButton.h"
 
 // Hardware instances - these will be injected into our controllers
 AccelStepper hoursTens(AccelStepper::DRIVER, HOURS_TENS_STEP_PIN, HOURS_TENS_DIR_PIN);
@@ -38,6 +39,9 @@ TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 // GPS processor with real dependencies
 GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &flapDisplay, &ledController, &Serial1);
 
+// Timezone button with debouncing
+DebouncedButton timezoneButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS);
+
 void setup() {
     // Initialize serial communication for console output
     Serial.begin(SERIAL_BAUD_RATE);
@@ -52,10 +56,8 @@ void setup() {
     SPI.setTX(TFT_MOSI_PIN);
     SPI.setSCK(TFT_SCK_PIN);
 
-    // Initialize timezone button with internal pullup (active low)
-    pinMode(TIMEZONE_BUTTON_PIN, INPUT_PULLUP);
-
     // Initialize LED controller
+    timezoneButton.initialize();
     ledController.initialize();
     flapDisplay.initialize();
     tftDisplay.initialize();
@@ -68,19 +70,10 @@ void setup() {
 }
 
 void loop() {
-    // Handle timezone button with debouncing (active low)
-    static unsigned long lastButtonPress = 0;
-    static bool lastButtonState = HIGH;
-    bool currentButtonState = digitalRead(TIMEZONE_BUTTON_PIN);
-    
-    if (currentButtonState == LOW && lastButtonState == HIGH) {
-        unsigned long currentTime = millis();
-        if (currentTime - lastButtonPress >= BUTTON_DEBOUNCE_MS) {
-            gpsProcessor.incrementTimezoneOffset();
-            lastButtonPress = currentTime;
-        }
+    // Handle timezone button
+    if (timezoneButton.pressed()) {
+        gpsProcessor.incrementTimezoneOffset();
     }
-    lastButtonState = currentButtonState;
 
     // Process GPS data using GPSProcessor
     gpsProcessor.processIncomingData();

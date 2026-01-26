@@ -20,6 +20,8 @@ void GPSProcessor::incrementTimezoneOffset() {
     }
     Serial.print("Timezone offset changed to: ");
     Serial.println(timezoneOffsetHours_);
+
+    processGPSData(); // Reprocess GPS data to update display with new timezone
 }
 
 void GPSProcessor::initialize() {
