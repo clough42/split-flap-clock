@@ -2,16 +2,15 @@
 #define TFT_DISPLAY_H
 
 #include <Arduino.h>
-#include <Adafruit_ILI9341.h>
+
 #include <Adafruit_GFX.h>
-#include <XPT2046_Touchscreen.h>
+#include <Adafruit_ILI9341.h>
 #include <SPI.h>
 #include "TimeData.h"
 
 class TFTDisplay {
 private:
     Adafruit_ILI9341 tft_;
-    XPT2046_Touchscreen touch_;
     TimeData lastDisplayedTime_;
     unsigned long lastUpdateTime_;
     
@@ -20,7 +19,7 @@ private:
     bool timeChanged(const TimeData& newTime);
     
 public:
-    TFTDisplay(int tftCS, int tftDC, int tftRST, int touchCS, int touchIRQ);
+    TFTDisplay(int tftCS, int tftDC, int tftRST);
     
     void initialize();
     void updateTime(const TimeData& timeData);

@@ -16,6 +16,18 @@
 // HARDWARE CONFIGURATION
 // ============================================================================
 
+// TFT Display Pin Assignments (ILI9341) - Default SPI0 pins
+#define TFT_MISO_PIN            16       // Hardware SPI MISO (default)
+#define TFT_CS_PIN              17       // TFT chip select
+#define TFT_SCK_PIN             18       // Hardware SPI SCK
+#define TFT_MOSI_PIN            19       // Hardware SPI MOSI (default)
+#define TFT_DC_PIN              20       // TFT data/command
+#define TFT_RST_PIN             255      // TFT reset (255 = not used)
+
+// GPS Serial Pin Assignments
+#define GPS_TX_PIN              0
+#define GPS_RX_PIN              1
+
 // Stepper Motor Pin Assignments
 #define HOURS_TENS_STEP_PIN     2
 #define HOURS_TENS_DIR_PIN      3
@@ -35,17 +47,7 @@
 #define LED_PIN                 LED_BUILTIN  // Use Pico built-in LED (GPIO 25)
 #define DEBUG_PIN               15      // Debug timing pin for runMotors() measurement
 
-// TFT Display Pin Assignments (ILI9341) - Default SPI0 pins
-#define TFT_CS_PIN              17      // TFT chip select
-#define TFT_DC_PIN              20      // TFT data/command
-#define TFT_RST_PIN             255     // TFT reset (255 = not used)
-#define TFT_MOSI_PIN            19      // Hardware SPI MOSI (default)
-#define TFT_MISO_PIN            16      // Hardware SPI MISO (default)
-#define TFT_SCK_PIN             18      // Hardware SPI SCK
 
-// Touch Screen Pin Assignments
-#define TOUCH_CS_PIN            21      // Touch chip select
-#define TOUCH_IRQ_PIN           22      // Touch interrupt (custom)
 
 // ============================================================================
 // MOTOR CONFIGURATION

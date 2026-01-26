@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <SPI.h>
 
 // Include configuration
 #include "Configuration.h"
@@ -32,7 +33,7 @@ LEDController ledController(LED_PIN);
 // Flap display (depends on stepper controllers)
 FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &motorMinutesOnes, &motorSecondsTens, &motorSecondsOnes, ENABLE_PIN, DEBUG_PIN);
 
-TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN, TOUCH_CS_PIN, TOUCH_IRQ_PIN);
+TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
 // GPS processor with real dependencies
 GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &flapDisplay, &ledController, &Serial1);
@@ -42,6 +43,15 @@ void setup() {
     Serial.begin(SERIAL_BAUD_RATE);
     Serial.println("GPS Split-Flap Clock Started");
     
+    // Select pins for GPS UART
+    Serial1.setRX(GPS_RX_PIN);
+    Serial1.setTX(GPS_TX_PIN);
+
+    // Select pins for TFT SPI
+    SPI.setRX(TFT_MISO_PIN);
+    SPI.setTX(TFT_MOSI_PIN);
+    SPI.setSCK(TFT_SCK_PIN);
+
     // Initialize LED controller
     ledController.initialize();
     flapDisplay.initialize();
