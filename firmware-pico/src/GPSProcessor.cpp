@@ -4,8 +4,8 @@
 #include "TFTDisplay.h"
 #include "Configuration.h"
 
-GPSProcessor::GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, LEDController* ledController, HardwareSerial* serial) 
-    : timeDisplay_(timeDisplay), ledController_(ledController), displayController_(nullptr), serial_(serial),
+GPSProcessor::GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, TFTDisplay* displayController, LEDController* ledController, HardwareSerial* serial) 
+    : timeDisplay_(timeDisplay), displayController_(displayController), ledController_(ledController), serial_(serial),
       timezoneOffsetHours_(timezoneOffset) {
 }
 

@@ -25,12 +25,15 @@ void FlapDisplay::initialize() {
 void FlapDisplay::updateTime(const TimeData& timeData) {
     // Only update if time is valid
     if (timeData.validTime) {
+        // the motors are running in the other core, so we need to pause it before making updates
+        rp2040.idleOtherCore();
         hoursTens_->moveToDigit(timeData.localHours / 10);
         hoursOnes_->moveToDigit(timeData.localHours % 10);
         minutesTens_->moveToDigit(timeData.localMinutes / 10);
         minutesOnes_->moveToDigit(timeData.localMinutes % 10);
         secondsTens_->moveToDigit(timeData.localSeconds / 10);
         secondsOnes_->moveToDigit(timeData.localSeconds % 10);
+        rp2040.resumeOtherCore();
     }
 }
 

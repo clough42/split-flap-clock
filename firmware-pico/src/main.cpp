@@ -37,7 +37,7 @@ FlapDisplay flapDisplay(&motorHoursTens, &motorHoursOnes, &motorMinutesTens, &mo
 TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
 // GPS processor with real dependencies
-GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &flapDisplay, &ledController, &Serial1);
+GPSProcessor gpsProcessor(TIMEZONE_OFFSET_HOURS, &flapDisplay, &tftDisplay, &ledController, &Serial1);
 
 // Timezone button with debouncing
 DebouncedButton timezoneButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS);
@@ -63,10 +63,13 @@ void setup() {
     tftDisplay.initialize();
     gpsProcessor.initialize();
     
-    // Set TFT display controller
-    gpsProcessor.setDisplayController(&tftDisplay);
-    
-    Serial.println("GPSProcessor initialized. LED will toggle when GPS gets valid time.");
+    // release core 1 for motor control
+    rp2040.fifo.push(1);
+}
+
+void setup1() {
+    // wait for signal from core 0
+    rp2040.fifo.pop();
 }
 
 void loop() {
@@ -77,8 +80,9 @@ void loop() {
 
     // Process GPS data using GPSProcessor
     gpsProcessor.processIncomingData();
+}
 
+void loop1() {
     // Service the stepper motors
     flapDisplay.runMotors();
-
 }

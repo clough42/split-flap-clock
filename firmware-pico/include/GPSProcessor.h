@@ -12,7 +12,7 @@ class TFTDisplay;
 
 class GPSProcessor {
 public:
-    GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, LEDController* ledController, HardwareSerial* serial);
+    GPSProcessor(int timezoneOffset, FlapDisplay* timeDisplay, TFTDisplay* tftDisplay,LEDController* ledController, HardwareSerial* serial);
     
     void initialize();
     void processIncomingData();
