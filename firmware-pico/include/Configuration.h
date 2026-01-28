@@ -57,7 +57,6 @@
 #define WATCHDOG_TIMEOUT_MS     4000    // Watchdog timer timeout in milliseconds
 
 // ============================================================================
-
 // MOTOR CONFIGURATION
 // ============================================================================
 #define STEPS_PER_POSITION      160     // 200 * 8 microsteps / 10 positions
