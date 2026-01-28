@@ -7,7 +7,7 @@
 #define DIGITS_PER_WHEEL       10
 
 StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos)
-    : motor_(stepperMotor), currentPosition_(0), stepsPerPosition_(stepsPerPos) {
+    : motor_(stepperMotor), targetDigit_(0), stepsPerPosition_(stepsPerPos) {
     motor_.setMaxSpeed(MOTOR_MAX_SPEED);
     motor_.setAcceleration(MOTOR_ACCELERATION);
     motor_.setPinsInverted(MOTOR_INVERT_DIRECTION);
@@ -15,21 +15,23 @@ StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos
 
 void StepperController::moveToDigit(int targetDigit) {
     if (targetDigit < MIN_DIGIT || targetDigit > MAX_DIGIT) return;
-    
-    // Calculate forward-only distance
-    int forwardSteps;
-    if (targetDigit >= currentPosition_) {
-        // Normal forward movement
-        forwardSteps = (targetDigit - currentPosition_) * stepsPerPosition_;
+
+    // Use our tracked targetDigit_ for logic, and motor_.targetPosition() for step reference
+    long currentStepTarget = motor_.targetPosition();
+    int currentDigit = targetDigit_;
+
+    int forwardDigits;
+    if (targetDigit >= currentDigit) {
+        forwardDigits = targetDigit - currentDigit;
     } else {
-        // Wrap around (go past 9 back to target)
-        forwardSteps = ((DIGITS_PER_WHEEL - currentPosition_) + targetDigit) * stepsPerPosition_;
+        forwardDigits = (DIGITS_PER_WHEEL - currentDigit) + targetDigit;
     }
-    
-    if (forwardSteps > 0) {
-        motor_.move(forwardSteps);
-    }
-    currentPosition_ = targetDigit;
+
+    if (forwardDigits == 0) return; // Already at target
+
+    long newStepTarget = currentStepTarget + (forwardDigits * stepsPerPosition_);
+    motor_.moveTo(newStepTarget);
+    targetDigit_ = targetDigit;
 }
 
 void StepperController::run() {

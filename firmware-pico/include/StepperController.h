@@ -6,7 +6,7 @@
 class StepperController {
 private:
     AccelStepper& motor_;
-    int currentPosition_;  // 0-9
+    int targetDigit_;  // 0-9, the digit we are moving toward
     int stepsPerPosition_;
 
 public:
