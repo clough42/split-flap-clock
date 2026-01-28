@@ -16,10 +16,18 @@ void FlapDisplay::initialize() {
     // Initialize shared motor enable pin (active low)
     pinMode(enablePin_, OUTPUT);
     digitalWrite(enablePin_, LOW);  // Enable all motors
-    
+
     // Initialize debug pin for timing measurement
     pinMode(debugPin_, OUTPUT);
     digitalWrite(debugPin_, LOW);  // Start low
+
+    // Initialize all stepper controllers (homing pin setup)
+    hoursTens_.initialize();
+    hoursOnes_.initialize();
+    minutesTens_.initialize();
+    minutesOnes_.initialize();
+    secondsTens_.initialize();
+    secondsOnes_.initialize();
 }
 
 void FlapDisplay::updateTime(const TimeData& timeData) {

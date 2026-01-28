@@ -25,12 +25,12 @@ AccelStepper secondsTens(AccelStepper::DRIVER, SECONDS_TENS_STEP_PIN, SECONDS_TE
 AccelStepper secondsOnes(AccelStepper::DRIVER, SECONDS_ONES_STEP_PIN, SECONDS_ONES_DIR_PIN);
 
 // Controller instances - initialized directly in dependency order
-StepperController motorHoursTens(hoursTens, STEPS_PER_POSITION);
-StepperController motorHoursOnes(hoursOnes, STEPS_PER_POSITION);
-StepperController motorMinutesTens(minutesTens, STEPS_PER_POSITION);
-StepperController motorMinutesOnes(minutesOnes, STEPS_PER_POSITION);
-StepperController motorSecondsTens(secondsTens, STEPS_PER_POSITION);
-StepperController motorSecondsOnes(secondsOnes, STEPS_PER_POSITION);
+StepperController motorHoursTens(hoursTens, STEPS_PER_POSITION, HOURS_TENS_HOME_PIN);
+StepperController motorHoursOnes(hoursOnes, STEPS_PER_POSITION, HOURS_ONES_HOME_PIN);
+StepperController motorMinutesTens(minutesTens, STEPS_PER_POSITION, MINUTES_TENS_HOME_PIN);
+StepperController motorMinutesOnes(minutesOnes, STEPS_PER_POSITION, MINUTES_ONES_HOME_PIN);
+StepperController motorSecondsTens(secondsTens, STEPS_PER_POSITION, SECONDS_TENS_HOME_PIN);
+StepperController motorSecondsOnes(secondsOnes, STEPS_PER_POSITION, SECONDS_ONES_HOME_PIN);
 
 // LED controller (no dependencies)
 LEDController ledController(LED_PIN);
