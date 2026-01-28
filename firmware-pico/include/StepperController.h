@@ -9,11 +9,14 @@ private:
     int targetDigit_;  // 0-9, the digit we are moving toward
     int stepsPerPosition_;
 
+    void resetStepCountIfStationary();
+
 public:
     StepperController(AccelStepper& stepperMotor, int stepsPerPos);
 
     void moveToDigit(int targetDigit);
     void run();
+
 };
 
 #endif // STEPPER_CONTROLLER_H

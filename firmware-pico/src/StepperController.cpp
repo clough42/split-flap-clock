@@ -1,3 +1,4 @@
+
 #include "StepperController.h"
 #include "Configuration.h"
 
@@ -14,26 +15,35 @@ StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos
 }
 
 void StepperController::moveToDigit(int targetDigit) {
+    // sanity check to avoig big ugly moves if something goes terribly wrong
     if (targetDigit < MIN_DIGIT || targetDigit > MAX_DIGIT) return;
 
-    // Use our tracked targetDigit_ for logic, and motor_.targetPosition() for step reference
-    long currentStepTarget = motor_.targetPosition();
-    int currentDigit = targetDigit_;
+    // drop out if already at target
+    if (targetDigit == targetDigit_) return;
 
-    int forwardDigits;
-    if (targetDigit >= currentDigit) {
-        forwardDigits = targetDigit - currentDigit;
-    } else {
-        forwardDigits = (DIGITS_PER_WHEEL - currentDigit) + targetDigit;
-    }
+    // reset step count if stationary to avoid step count overflow over long runtimes
+    resetStepCountIfStationary();
 
-    if (forwardDigits == 0) return; // Already at target
+    // use current target digit to figure how how far to move (forward only)
+    int forwardDigits = (targetDigit - targetDigit_);
+    if (forwardDigits < 0) forwardDigits += DIGITS_PER_WHEEL;
 
-    long newStepTarget = currentStepTarget + (forwardDigits * stepsPerPosition_);
+    // calculate new step target and command move
+    long newStepTarget = motor_.targetPosition() + (forwardDigits * stepsPerPosition_);
     motor_.moveTo(newStepTarget);
+
+    // remember where we are going
     targetDigit_ = targetDigit;
 }
 
 void StepperController::run() {
     motor_.run();
+}
+
+void StepperController::resetStepCountIfStationary() {
+    // if the motor isn't moving, this is a good time to reset the current
+    // and target positions to zero to avoid step count overflow over long runtimes
+    if (motor_.distanceToGo() == 0) {
+        motor_.setCurrentPosition(0);
+    }
 }
