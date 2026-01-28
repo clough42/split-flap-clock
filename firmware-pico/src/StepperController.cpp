@@ -6,8 +6,8 @@
 #define MAX_DIGIT              9
 #define DIGITS_PER_WHEEL       10
 
-StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos, int homingPin)
-    : motor_(stepperMotor), targetDigit_(0), stepsPerPosition_(stepsPerPos), homingPin_(homingPin) {
+StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos, int homingPin, int homingOffsetSteps)
+    : motor_(stepperMotor), targetDigit_(0), stepsPerPosition_(stepsPerPos), homingPin_(homingPin), homingOffsetSteps_(homingOffsetSteps) {
     motor_.setMaxSpeed(MOTOR_MAX_SPEED);
     motor_.setAcceleration(MOTOR_ACCELERATION);
     motor_.setPinsInverted(MOTOR_INVERT_DIRECTION);
@@ -40,7 +40,7 @@ void StepperController::home() {
     motor_.setCurrentPosition(0);
 
     // move past the trigger point by the configured offset (to reach position 0)
-    motor_.moveTo(HOMING_OFFSET_STEPS);
+    motor_.moveTo(homingOffsetSteps_);
     while (motor_.distanceToGo() != 0) {
         motor_.run();
         rp2040.wdt_reset();
