@@ -60,13 +60,13 @@
 // MOTOR CONFIGURATION
 // ============================================================================
 #define STEPS_PER_POSITION      160     // 200 * 8 microsteps / 10 positions
-#define MOTOR_HOMING_SPEED      500     // Steps per second during homing
-#define MOTOR_MAX_SPEED         1000    // Steps per second
-#define MOTOR_ACCELERATION      10000   // Steps per second²
+#define MOTOR_HOMING_SPEED      5000     // Steps per second during homing
+#define MOTOR_MAX_SPEED         5000    // Steps per second
+#define MOTOR_ACCELERATION      50000   // Steps per second²
 #define MOTOR_INVERT_DIRECTION  true    // Set to true to invert stepper direction, false for normal
 
 // Per-motor homing offset (number of steps to continue moving after the home switch is triggered)
-#define HOMING_OFFSET_STEPS_HOURS_TENS      115
+#define HOMING_OFFSET_STEPS_HOURS_TENS      110
 #define HOMING_OFFSET_STEPS_HOURS_ONES      90
 #define HOMING_OFFSET_STEPS_MINUTES_TENS    90
 #define HOMING_OFFSET_STEPS_MINUTES_ONES    90

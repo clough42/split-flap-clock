@@ -23,13 +23,13 @@ bool StepperController::runHoming() {
     switch (homingState_) {
         case UNHOMED:
             // Start clearing
-            motor_.setSpeed(MOTOR_HOMING_SPEED);
+            motor_.move(stepsPerPosition_ * DIGITS_PER_WHEEL * 2); // command two full revolutions forward
             homingState_ = CLEARING;
             break;
         case CLEARING:
             // Move until endstop is de-asserted
             if (digitalRead(homingPin_) == LOW) {
-                motor_.runSpeed();
+                motor_.run();
             } else {
                 homingState_ = HOMING;
             }
@@ -37,11 +37,9 @@ bool StepperController::runHoming() {
         case HOMING:
             // Move until endstop is asserted
             if (digitalRead(homingPin_) == HIGH) {
-                motor_.runSpeed();
+                motor_.run();
             } else {
-                motor_.stop();
-                motor_.setCurrentPosition(0);
-                motor_.moveTo(homingOffsetSteps_);
+                motor_.move(homingOffsetSteps_); // move past the endstop
                 homingState_ = OFFSETTING;
             }
             break;
@@ -57,7 +55,7 @@ bool StepperController::runHoming() {
         case HOMED:
             return true;
     }
-    return homingState_ == HOMED;
+    return false;
 }
 
 void StepperController::moveToDigit(int targetDigit) {
