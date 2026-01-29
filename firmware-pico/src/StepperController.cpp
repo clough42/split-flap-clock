@@ -15,40 +15,49 @@ StepperController::StepperController(AccelStepper& stepperMotor, int stepsPerPos
 
 void StepperController::initialize() {
     pinMode(homingPin_, INPUT_PULLUP); // Active low with pullup
-
-    home();
+    homingState_ = UNHOMED;
 }
 
-void StepperController::home() {
-    // Move forward until homing pin is pulled low (active low)
-    motor_.setSpeed(MOTOR_HOMING_SPEED);
-
-    // first, rotate until the homing switch is de-asserted, just to make sure we're clear
-    while (digitalRead(homingPin_) == LOW) {
-        motor_.runSpeed();
-        rp2040.wdt_reset();
+// Homing state machine
+bool StepperController::runHoming() {
+    switch (homingState_) {
+        case UNHOMED:
+            // Start clearing
+            motor_.setSpeed(MOTOR_HOMING_SPEED);
+            homingState_ = CLEARING;
+            break;
+        case CLEARING:
+            // Move until endstop is de-asserted
+            if (digitalRead(homingPin_) == LOW) {
+                motor_.runSpeed();
+            } else {
+                homingState_ = HOMING;
+            }
+            break;
+        case HOMING:
+            // Move until endstop is asserted
+            if (digitalRead(homingPin_) == HIGH) {
+                motor_.runSpeed();
+            } else {
+                motor_.stop();
+                motor_.setCurrentPosition(0);
+                motor_.moveTo(homingOffsetSteps_);
+                homingState_ = OFFSETTING;
+            }
+            break;
+        case OFFSETTING:
+            if (motor_.distanceToGo() != 0) {
+                motor_.run();
+            } else {
+                targetDigit_ = 0;
+                motor_.setCurrentPosition(0);
+                homingState_ = HOMED;
+            }
+            break;
+        case HOMED:
+            return true;
     }
-
-    // then rotate until we hit it again
-    while (digitalRead(homingPin_) == HIGH) {
-        motor_.runSpeed();
-        rp2040.wdt_reset();
-    }
-
-    // Stop and set current position as zero
-    motor_.stop();
-    motor_.setCurrentPosition(0);
-
-    // move past the trigger point by the configured offset (to reach position 0)
-    motor_.moveTo(homingOffsetSteps_);
-    while (motor_.distanceToGo() != 0) {
-        motor_.run();
-        rp2040.wdt_reset();
-    }
-    
-    // For predictability, set logical digit and stepper position to zero
-    targetDigit_ = 0;
-    motor_.setCurrentPosition(0);
+    return homingState_ == HOMED;
 }
 
 void StepperController::moveToDigit(int targetDigit) {

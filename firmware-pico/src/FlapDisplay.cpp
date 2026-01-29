@@ -28,6 +28,23 @@ void FlapDisplay::initialize() {
     minutesOnes_.initialize();
     secondsTens_.initialize();
     secondsOnes_.initialize();
+
+    // home the motors
+    homeAllMotors();
+}
+
+void FlapDisplay::homeAllMotors() {
+    bool allHomed = false;
+    do {
+        allHomed = true;
+        allHomed &= hoursTens_.runHoming();
+        allHomed &= hoursOnes_.runHoming();
+        allHomed &= minutesTens_.runHoming();
+        allHomed &= minutesOnes_.runHoming();
+        allHomed &= secondsTens_.runHoming();
+        allHomed &= secondsOnes_.runHoming();
+        rp2040.wdt_reset();
+    } while (!allHomed);
 }
 
 void FlapDisplay::updateTime(const TimeData& timeData) {
@@ -57,3 +74,4 @@ void FlapDisplay::runMotors() {
     
     digitalWrite(debugPin_, LOW);   // End timing measurement
 }
+

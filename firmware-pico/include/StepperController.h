@@ -3,23 +3,30 @@
 
 #include <AccelStepper.h>
 
+
 class StepperController {
+public:
+    StepperController(AccelStepper& stepperMotor, int stepsPerPos, int homingPin, int homingOffsetSteps);
+    void initialize();
+    void moveToDigit(int targetDigit);
+    void run();
+    bool runHoming();
+
 private:
+    enum HomingState {
+        UNHOMED,
+        CLEARING,
+        HOMING,
+        OFFSETTING,
+        HOMED
+    };
     AccelStepper& motor_;
     int targetDigit_;  // 0-9, the digit we are moving toward
     int stepsPerPosition_;
     int homingPin_;
     int homingOffsetSteps_;
-
+    HomingState homingState_ = UNHOMED;
     void resetStepCountIfStationary();
-    void home();
-
-public:
-    StepperController(AccelStepper& stepperMotor, int stepsPerPos, int homingPin, int homingOffsetSteps);
-
-    void initialize();
-    void moveToDigit(int targetDigit);
-    void run();
 };
 
 #endif // STEPPER_CONTROLLER_H

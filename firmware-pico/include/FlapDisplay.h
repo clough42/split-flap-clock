@@ -15,6 +15,7 @@ private:
     StepperController& secondsOnes_;
     int enablePin_;
     int debugPin_;  // Pin 22 for timing measurement
+    void homeAllMotors();
 
 public:
     FlapDisplay(StepperController& hoursTens,
