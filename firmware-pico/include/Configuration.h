@@ -51,7 +51,8 @@
 #define TIMEZONE_BUTTON_PIN     22      // Timezone offset button (active low with internal pullup)
 
 // Button Debounce Configuration
-#define BUTTON_DEBOUNCE_MS      200     // Debounce time in milliseconds
+#define BUTTON_DEBOUNCE_MS      50     // Debounce time in milliseconds
+#define BUTTON_LONG_PRESS_MS    2000   // Long press time in milliseconds
 
 // Watchdog Timer Configuration
 #define WATCHDOG_TIMEOUT_MS     4000    // Watchdog timer timeout in milliseconds

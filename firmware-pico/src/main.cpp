@@ -44,7 +44,7 @@ TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 GPSProcessor gpsProcessor(configPersistence, flapDisplay, tftDisplay, ledController, Serial1);
 
 // Timezone button with debouncing
-DebouncedButton timezoneButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS);
+DebouncedButton configButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS, BUTTON_LONG_PRESS_MS);
 
 void setup() {
     // initialize the hardware watchdog timer
@@ -65,7 +65,7 @@ void setup() {
 
     // Initialize everything
     configPersistence.initialize();
-    timezoneButton.initialize();
+    configButton.initialize();
     ledController.initialize();
     flapDisplay.initialize();
     tftDisplay.initialize();
@@ -81,8 +81,10 @@ void setup1() {
 }
 
 void loop() {
+    configButton.update();
+
     // Handle timezone button
-    if (timezoneButton.pressed()) {
+    if (configButton.wasShortPressed()) {
         gpsProcessor.incrementTimezoneOffset();
     }
 
