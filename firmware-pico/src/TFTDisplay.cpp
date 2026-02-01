@@ -1,42 +1,26 @@
+
 #include "TFTDisplay.h"
 #include "Configuration.h"
 #include "LEDController.h"
 
+// For ST7735, use Adafruit_ST7735(tftCS, tftDC, tftRST)
 TFTDisplay::TFTDisplay(int tftCS, int tftDC, int tftRST)
     : tft_(tftCS, tftDC, tftRST) {
-    // Initialize time data with safe defaults
     lastDisplayedTime_ = {0, 0, 0, 0, 0, 0, 0, false, "NO SIGNAL"};
     lastUpdateTime_ = 0;
 }
 
 void TFTDisplay::initialize() {
-    // Adafruit ILI9341 uses hardware SPI (pins set in main before begin)
-    tft_.begin();
-    tft_.setRotation(1); // Landscape orientation (fixed upside-down)
-    tft_.fillScreen(ILI9341_BLACK);
-
-    // Draw initial background
+    // Adafruit ST7735 uses hardware SPI (pins set in main before begin)
+    tft_.initR(INITR_MINI160x80); // 80x160 ST7735
+    tft_.setRotation(1); // Landscape orientation
+    tft_.fillScreen(ST77XX_BLACK);
     drawBackground();
 }
 
 void TFTDisplay::drawBackground() {
-    tft_.fillScreen(ILI9341_BLACK);
-
-    // Draw title
-    tft_.setTextColor(ILI9341_WHITE);
-    tft_.setTextSize(2);
-    tft_.setCursor(50, 10);
-    tft_.println("GPS Split-Flap Clock");
-
-    // Draw divider line under title
-    tft_.drawLine(0, 35, 320, 35, ILI9341_CYAN);
-
-    // Draw time labels
-    tft_.setTextSize(2);
-    tft_.setCursor(20, 60);
-    tft_.println("UTC Time:");
-    tft_.setCursor(20, 120);
-    tft_.println("Local Time:");
+    tft_.fillScreen(ST77XX_BLACK);
+    // No title, no divider, no labels here; labels will be drawn with the time in updateTime
 }
 
 bool TFTDisplay::timeChanged(const TimeData& newTime) {
@@ -70,18 +54,24 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
     if (timeChanged(timeData) || (currentTime - lastUpdateTime_) >= 1000) {
         lastUpdateTime_ = currentTime;
 
-        // Display UTC time (draw directly over previous, no clearing needed)
-        tft_.setTextColor(ILI9341_CYAN, ILI9341_BLACK);  // Set background color
-        tft_.setTextSize(3);
-        tft_.setCursor(20, 85);
+        // Display UTC time
+        tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+        tft_.setTextSize(2);
+        tft_.setCursor(2, 6);
+        tft_.print("UTC:");
+        tft_.setTextColor(ST77XX_CYAN, ST77XX_BLACK);
+        tft_.setCursor(60, 6);
         char timeStr[10];
         sprintf(timeStr, "%02d:%02d:%02d", timeData.utcHours, timeData.utcMinutes, timeData.utcSeconds);
         tft_.print(timeStr);
 
-        // Display Local time (draw directly over previous, no clearing needed)
-        tft_.setTextColor(ILI9341_GREEN, ILI9341_BLACK);  // Set background color
-        tft_.setTextSize(3);
-        tft_.setCursor(20, 145);
+        // Display Local time
+        tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+        tft_.setTextSize(2);
+        tft_.setCursor(2, 36);
+        tft_.print("LOC:");
+        tft_.setTextColor(ST77XX_GREEN, ST77XX_BLACK);
+        tft_.setCursor(60, 36);
         sprintf(timeStr, "%02d:%02d:%02d", timeData.localHours, timeData.localMinutes, timeData.localSeconds);
         tft_.print(timeStr);
 
@@ -90,29 +80,30 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
 
     if( statusChanged(timeData)) {
         // Color code based on signal strength
-        uint16_t statusColor = ILI9341_WHITE;
+        uint16_t statusColor = ST77XX_WHITE;
         if (timeData.signalStrength) {
-            if (strcmp(timeData.signalStrength, "EXCELLENT") == 0) statusColor = ILI9341_GREEN;
-            else if (strcmp(timeData.signalStrength, "GOOD") == 0) statusColor = ILI9341_CYAN;
-            else if (strcmp(timeData.signalStrength, "MODERATE") == 0) statusColor = ILI9341_YELLOW;
-            else if (strcmp(timeData.signalStrength, "FAIR") == 0) statusColor = ILI9341_MAGENTA;
-            else if (strcmp(timeData.signalStrength, "POOR") == 0) statusColor = ILI9341_RED;
-            else if (strcmp(timeData.signalStrength, "NO SIGNAL") == 0) statusColor = ILI9341_RED;
+            if (strcmp(timeData.signalStrength, "EXCELLENT") == 0) statusColor = ST77XX_GREEN;
+            else if (strcmp(timeData.signalStrength, "GOOD") == 0) statusColor = ST77XX_CYAN;
+            else if (strcmp(timeData.signalStrength, "MODERATE") == 0) statusColor = ST77XX_YELLOW;
+            else if (strcmp(timeData.signalStrength, "FAIR") == 0) statusColor = ST77XX_MAGENTA;
+            else if (strcmp(timeData.signalStrength, "POOR") == 0) statusColor = ST77XX_RED;
+            else if (strcmp(timeData.signalStrength, "NO SIGNAL") == 0) statusColor = ST77XX_RED;
         }
 
         char* lockStr = timeData.validTime ? (char *)"locked" : (char *)"unlocked";
 
         char statusStr[50];
         if (timeData.signalStrength) {
-            sprintf(statusStr, "GPS: %s (%d satellites) %s", timeData.signalStrength, timeData.satelliteCount, lockStr);
+            sprintf(statusStr, "GPS: %s (%d) %s", timeData.signalStrength, timeData.satelliteCount, lockStr);
         } else {
-            sprintf(statusStr, "GPS: UNKNOWN (%d satellites) %s", timeData.satelliteCount, lockStr);
+            sprintf(statusStr, "GPS: UNKNOWN (%d) %s", timeData.satelliteCount, lockStr);
         }
 
-        tft_.fillRect(20, 190, 280, 20, ILI9341_BLACK);
+        // Move status line up to fit below time displays
+        tft_.fillRect(0, 64, 160, 16, ST77XX_BLACK);
         tft_.setTextColor(statusColor);
         tft_.setTextSize(1);
-        tft_.setCursor(20, 190);
+        tft_.setCursor(0, 66);
         tft_.print(statusStr);
 
         updated = true;

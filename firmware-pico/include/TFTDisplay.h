@@ -4,13 +4,13 @@
 #include <Arduino.h>
 
 #include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
+#include <Adafruit_ST7735.h>
 #include <SPI.h>
 #include "TimeData.h"
 
 class TFTDisplay {
 private:
-    Adafruit_ILI9341 tft_;
+    Adafruit_ST7735 tft_;
     TimeData lastDisplayedTime_;
     unsigned long lastUpdateTime_;
     
