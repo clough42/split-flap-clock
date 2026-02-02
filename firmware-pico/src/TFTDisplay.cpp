@@ -1,12 +1,10 @@
-
-
 #include "TFTDisplay.h"
 #include "Configuration.h"
 #include "LEDController.h"
 
+// swap red and blue in RGB565 to support weird displays I accidentally bought
 #define SWAP_RB_565(val) ( ((val & 0x1F) << 11) | (val & 0x7E0) | ((val >> 11) & 0x1F) )
 
-// For ST7735, use Adafruit_ST7735(tftCS, tftDC, tftRST)
 TFTDisplay::TFTDisplay(int tftCS, int tftDC, int tftRST)
     : tft_(tftCS, tftDC, tftRST) {
     lastDisplayedTime_ = {0, 0, 0, 0, 0, 0, 0, false, "NO SIGNAL"};
@@ -14,7 +12,6 @@ TFTDisplay::TFTDisplay(int tftCS, int tftDC, int tftRST)
 }
 
 void TFTDisplay::initialize() {
-    // Adafruit ST7735 uses hardware SPI (pins set in main before begin)
     tft_.initR(INITR_MINI160x80); // 80x160 ST7735
     tft_.setRotation(1); // Landscape orientation
     tft_.fillScreen(ST77XX_BLACK);
@@ -41,7 +38,7 @@ void TFTDisplay::showHomingScreen() {
 void TFTDisplay::showWaitingForGpsScreen() {
     drawBackground();
     tft_.setTextColor(SWAP_RB_565(ST77XX_RED), ST77XX_BLACK);
-    tft_.setTextSize(2); // Match HOMING message size
+    tft_.setTextSize(2);
     // Centered horizontally, vertically
     const char* msg1 = "WAITING";
     const char* msg2 = "FOR GPS";
@@ -65,7 +62,6 @@ void TFTDisplay::drawBackground() {
         tft_.fillScreen(ST77XX_BLACK);
         needsClear_ = false;
     }
-    // No title, no divider, no labels here; labels will be drawn with the time in updateTime
 }
 
 bool TFTDisplay::timeChanged(const TimeData& newTime) {
@@ -108,8 +104,8 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
         // Draw 12H / 24H indicator at the top
         tft_.setTextSize(1);
         int indicatorY = 2;
-        int indicatorX = 52; // Centered for 160px wide screen
-        // Draw "12H / 24H" with active mode white, inactive gray
+        int indicatorX = 52;
+        
         if (timeData.is24HourFormat) {
             tft_.setTextColor(GRAY, ST77XX_BLACK); tft_.setCursor(indicatorX, indicatorY); tft_.print("12H");
             tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); tft_.setCursor(indicatorX + 24, indicatorY); tft_.print("/");
@@ -126,9 +122,8 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
             tft_.print(timeData.isPm ? "PM" : "AM");
         }
 
-        // Move times down to make room for indicator
-        int utcY = 18;    // Move UTC time down 2 pixels
-        int localY = 45;  // Move local time up 1 pixel
+        int utcY = 18;
+        int localY = 45;
 
         // Display UTC time
         tft_.setTextColor(GRAY, ST77XX_BLACK);
@@ -177,7 +172,6 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
             sprintf(statusStr, "GPS: UNKNOWN (%d) %s", timeData.satelliteCount, lockStr);
         }
 
-        // Move status line up 1 more pixel
         tft_.fillRect(0, 71, 160, 16, ST77XX_BLACK);
         tft_.setTextColor(statusColor);
         tft_.setTextSize(1);

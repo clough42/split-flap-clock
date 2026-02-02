@@ -1,7 +1,6 @@
 #include "StepperController.h"
 #include "Configuration.h"
 
-// Private implementation constants
 #define MIN_DIGIT              0
 #define MAX_DIGIT              9
 #define DIGITS_PER_WHEEL       10

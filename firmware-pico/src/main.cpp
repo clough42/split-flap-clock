@@ -16,7 +16,7 @@
 // Configuration persistence
 ConfigPersistence configPersistence;
 
-// Hardware instances - these will be injected into our controllers
+// Stepper motors
 AccelStepper hoursTens(AccelStepper::DRIVER, HOURS_TENS_STEP_PIN, HOURS_TENS_DIR_PIN);
 AccelStepper hoursOnes(AccelStepper::DRIVER, HOURS_ONES_STEP_PIN, HOURS_ONES_DIR_PIN);  
 AccelStepper minutesTens(AccelStepper::DRIVER, MINUTES_TENS_STEP_PIN, MINUTES_TENS_DIR_PIN);
@@ -24,7 +24,7 @@ AccelStepper minutesOnes(AccelStepper::DRIVER, MINUTES_ONES_STEP_PIN, MINUTES_ON
 AccelStepper secondsTens(AccelStepper::DRIVER, SECONDS_TENS_STEP_PIN, SECONDS_TENS_DIR_PIN);
 AccelStepper secondsOnes(AccelStepper::DRIVER, SECONDS_ONES_STEP_PIN, SECONDS_ONES_DIR_PIN);
 
-// Controller instances - initialized directly in dependency order
+// Motor digit controllers
 StepperController motorHoursTens(hoursTens, STEPS_PER_POSITION, HOURS_TENS_HOME_PIN, HOMING_OFFSET_STEPS_HOURS_TENS);
 StepperController motorHoursOnes(hoursOnes, STEPS_PER_POSITION, HOURS_ONES_HOME_PIN, HOMING_OFFSET_STEPS_HOURS_ONES);
 StepperController motorMinutesTens(minutesTens, STEPS_PER_POSITION, MINUTES_TENS_HOME_PIN, HOMING_OFFSET_STEPS_MINUTES_TENS);
@@ -32,18 +32,19 @@ StepperController motorMinutesOnes(minutesOnes, STEPS_PER_POSITION, MINUTES_ONES
 StepperController motorSecondsTens(secondsTens, STEPS_PER_POSITION, SECONDS_TENS_HOME_PIN, HOMING_OFFSET_STEPS_SECONDS_TENS);
 StepperController motorSecondsOnes(secondsOnes, STEPS_PER_POSITION, SECONDS_ONES_HOME_PIN, HOMING_OFFSET_STEPS_SECONDS_ONES);
 
-// LED controller (no dependencies)
+// LED controller
 LEDController ledController(LED_PIN);
 
-// Mechanical display (depends on stepper controllers)
+// Mechanical display
 MechanicalDisplay mechanicalDisplay(motorHoursTens, motorHoursOnes, motorMinutesTens, motorMinutesOnes, motorSecondsTens, motorSecondsOnes, ENABLE_PIN, DEBUG_PIN);
 
+// TFT display
 TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
-// GPS processor with real dependencies
+// GPS processor
 GPSProcessor gpsProcessor(configPersistence, mechanicalDisplay, tftDisplay, ledController, Serial1);
 
-// Timezone button with debouncing
+// Configuration button
 DebouncedButton configButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS, BUTTON_LONG_PRESS_MS);
 
 void setup() {
@@ -75,15 +76,16 @@ void setup() {
     tftDisplay.showWaitingForGpsScreen();
     gpsProcessor.initialize();
     
-    // release core 1 for motor control
+    // initialization is done, so we can signal core 1
     rp2040.fifo.push(1);
 }
 
 void setup1() {
-    // wait for signal from core 0
+    // block core 1 until we get the signal
     rp2040.fifo.pop();
 }
 
+// Main loop on core 0
 void loop() {
     // Handle config button
     configButton.update();
@@ -97,10 +99,11 @@ void loop() {
     // Process GPS data using GPSProcessor
     gpsProcessor.processIncomingData();
 
-    // let the watchdog know we're alive
+    // let the watchdog know we're still alive
     rp2040.wdt_reset();
 }
 
+// Main loop on core 1
 void loop1() {
     // Service the stepper motors
     mechanicalDisplay.runMotors();

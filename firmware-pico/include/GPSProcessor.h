@@ -20,7 +20,7 @@ public:
     void setDisplayController(TFTDisplay& displayController);
 
     // Timezone offset management
-    void incrementTimezoneOffset();  // Increment timezone offset (0-23, wrapping)
+    void incrementTimezoneOffset();
 
     // Time format management
     void toggleTimeFormat();

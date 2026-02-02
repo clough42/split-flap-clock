@@ -18,15 +18,15 @@ private:
     void homeAllMotors();
 
 public:
-    MechanicalDisplay
-(StepperController& hoursTens,
-               StepperController& hoursOnes,
-               StepperController& minutesTens,
-               StepperController& minutesOnes,
-               StepperController& secondsTens,
-               StepperController& secondsOnes,
-               int enablePin,
-               int debugPin);
+    MechanicalDisplay(
+                StepperController& hoursTens,
+                StepperController& hoursOnes,
+                StepperController& minutesTens,
+                StepperController& minutesOnes,
+                StepperController& secondsTens,
+                StepperController& secondsOnes,
+                int enablePin,
+                int debugPin);
 
     void initialize();
     void updateTime(const TimeData& timeData);

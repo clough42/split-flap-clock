@@ -21,7 +21,7 @@ void MechanicalDisplay::initialize() {
     pinMode(debugPin_, OUTPUT);
     digitalWrite(debugPin_, LOW);  // Start low
 
-    // Initialize all stepper controllers (homing pin setup)
+    // Initialize all stepper controllers
     hoursTens_.initialize();
     hoursOnes_.initialize();
     minutesTens_.initialize();
@@ -43,7 +43,7 @@ void MechanicalDisplay::homeAllMotors() {
         allHomed &= minutesOnes_.runHoming();
         allHomed &= secondsTens_.runHoming();
         allHomed &= secondsOnes_.runHoming();
-        rp2040.wdt_reset();
+        rp2040.wdt_reset(); // let the watchdog timer know we're still alive
     } while (!allHomed);
 }
 

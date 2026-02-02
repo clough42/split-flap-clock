@@ -57,7 +57,7 @@ void GPSProcessor::processIncomingData() {
 }
 
 const char* GPSProcessor::getSignalStrength(double hdop, int satellites) {
-    // No satellites = No Signal
+    // Not enough satellites = No Signal
     if (satellites < 3) {
         return "NO SIGNAL";
     }

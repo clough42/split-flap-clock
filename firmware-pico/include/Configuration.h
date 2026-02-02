@@ -11,13 +11,13 @@
 // HARDWARE CONFIGURATION
 // ============================================================================
 
-// TFT Display Pin Assignments (ILI9341) - Default SPI0 pins
-#define TFT_MISO_PIN            16       // Hardware SPI MISO (default)
+// TFT Display Pin Assignments
+#define TFT_MISO_PIN            16       // Hardware SPI MISO
 #define TFT_CS_PIN              17       // TFT chip select
 #define TFT_SCK_PIN             18       // Hardware SPI SCK
-#define TFT_MOSI_PIN            19       // Hardware SPI MOSI (default)
+#define TFT_MOSI_PIN            19       // Hardware SPI MOSI
 #define TFT_DC_PIN              20       // TFT data/command
-#define TFT_RST_PIN             21       // TFT reset (255 = not used)
+#define TFT_RST_PIN             21       // TFT reset
 
 // GPS Serial Pin Assignments
 #define GPS_TX_PIN              0
@@ -46,9 +46,9 @@
 
 // Control Pins
 #define ENABLE_PIN              14      // Active low - enables all stepper motors
-#define LED_PIN                 LED_BUILTIN  // Use Pico built-in LED (GPIO 25)
+#define LED_PIN                 LED_BUILTIN  // Use Pico built-in LED
 #define DEBUG_PIN               28      // Debug timing pin for runMotors() measurement
-#define TIMEZONE_BUTTON_PIN     22      // Timezone offset button (active low with internal pullup)
+#define TIMEZONE_BUTTON_PIN     22      // Timezone offset button
 
 // Button Debounce Configuration
 #define BUTTON_DEBOUNCE_MS      50     // Debounce time in milliseconds
