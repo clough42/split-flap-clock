@@ -66,11 +66,12 @@ void TFTDisplay::drawBackground() {
 
 bool TFTDisplay::timeChanged(const TimeData& newTime) {
     return (newTime.utcHours != lastDisplayedTime_.utcHours ||
-            newTime.utcMinutes != lastDisplayedTime_.utcMinutes ||
-            newTime.utcSeconds != lastDisplayedTime_.utcSeconds ||
-            newTime.localHours != lastDisplayedTime_.localHours ||
-            newTime.localMinutes != lastDisplayedTime_.localMinutes ||
-            newTime.localSeconds != lastDisplayedTime_.localSeconds);
+        newTime.utcMinutes != lastDisplayedTime_.utcMinutes ||
+        newTime.utcSeconds != lastDisplayedTime_.utcSeconds ||
+        newTime.localHours != lastDisplayedTime_.localHours ||
+        newTime.localMinutes != lastDisplayedTime_.localMinutes ||
+        newTime.localSeconds != lastDisplayedTime_.localSeconds ||
+        newTime.is24HourFormat != lastDisplayedTime_.is24HourFormat);
 }
 
 bool TFTDisplay::statusChanged(const TimeData& newTime) {
