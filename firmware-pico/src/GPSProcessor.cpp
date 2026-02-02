@@ -7,7 +7,7 @@
 #include "Configuration.h"
 
 GPSProcessor::GPSProcessor(ConfigPersistence& config, FlapDisplay& timeDisplay, TFTDisplay& displayController, LEDController& ledController, HardwareSerial& serial)
-    : config_(config), timeDisplay_(timeDisplay), displayController_(displayController), ledController_(ledController), serial_(serial){
+    : config_(config), timeDisplay_(timeDisplay), displayController_(displayController), ledController_(ledController), serial_(serial), is24HourFormat_(true) {
 }
 
 void GPSProcessor::setDisplayController(TFTDisplay& displayController) {
@@ -32,6 +32,16 @@ void GPSProcessor::initialize() {
     Serial.println("GPS serial interface initialized at 9600 baud");
 
     timezoneOffsetHours_ = config_.getTimezoneOffset();
+    is24HourFormat_ = config_.getIs24HourFormat();
+}
+void GPSProcessor::toggleTimeFormat() {
+    is24HourFormat_ = !is24HourFormat_;
+    config_.setIs24HourFormat(is24HourFormat_);
+    processGPSData(); // Update display and flaps
+}
+
+bool GPSProcessor::getIs24HourFormat() const {
+    return is24HourFormat_;
 }
 
 void GPSProcessor::processIncomingData() {
@@ -80,6 +90,7 @@ void GPSProcessor::processGPSData() {
     const char* signalStrength = getSignalStrength(hdop, satelliteCount);
     TimeData timeData;
 
+
     if (timeIsValid) {
         // Extract valid time components
         int utcHours = gps_.time.hour();
@@ -88,7 +99,6 @@ void GPSProcessor::processGPSData() {
 
         // Calculate local time
         int localHours = utcHours + timezoneOffsetHours_;
-
         // Handle day rollover
         if (localHours < 0) {
             localHours += 24;
@@ -96,13 +106,30 @@ void GPSProcessor::processGPSData() {
             localHours -= 24;
         }
 
+        int displayLocalHours = localHours;
+        bool isPM = false;
+        if (!is24HourFormat_) {
+            // Convert to 12-hour format for display/flap
+            if (displayLocalHours == 0) {
+                displayLocalHours = 12;
+                isPM = false;
+            } else if (displayLocalHours == 12) {
+                isPM = true;
+            } else if (displayLocalHours > 12) {
+                displayLocalHours -= 12;
+                isPM = true;
+            }
+        }
+
         // Populate time data with valid values
         timeData = {
             utcHours, utcMinutes, utcSeconds,
-            localHours, utcMinutes, utcSeconds,
+            displayLocalHours, utcMinutes, utcSeconds,
             satelliteCount,
             true,
-            signalStrength
+            signalStrength,
+            is24HourFormat_,
+            isPM
         };
 
         // Toggle LED for valid GPS
@@ -112,7 +139,7 @@ void GPSProcessor::processGPSData() {
         timeDisplay_.updateTime(timeData);
     } else {
         // GPS data not valid yet, but show satellite status
-        timeData = {0, 0, 0, 0, 0, 0, satelliteCount, false, signalStrength};
+        timeData = {0, 0, 0, 0, 0, 0, satelliteCount, false, signalStrength, is24HourFormat_, false};
     }
 
     // Always update display with current status

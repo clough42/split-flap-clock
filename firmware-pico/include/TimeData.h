@@ -12,6 +12,8 @@ struct TimeData {
     int satelliteCount;  // Number of satellites used in fix
     bool validTime;
     const char* signalStrength;  // Signal quality assessment
+    bool is24HourFormat; // true = 24h, false = 12h
+    bool isPm; // true = PM, false = AM (only valid if !is24HourFormat)
 };
 
 #endif // TIME_DATA_H

@@ -81,11 +81,13 @@ void setup1() {
 }
 
 void loop() {
+    // Handle config button
     configButton.update();
-
-    // Handle timezone button
     if (configButton.wasShortPressed()) {
         gpsProcessor.incrementTimezoneOffset();
+    }
+    if (configButton.wasLongPressed()) {
+        gpsProcessor.toggleTimeFormat();
     }
 
     // Process GPS data using GPSProcessor

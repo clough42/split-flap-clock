@@ -51,16 +51,45 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
 
     // Only update if time has changed or it's been more than 1 second
     unsigned long currentTime = millis();
+
     if (timeChanged(timeData) || (currentTime - lastUpdateTime_) >= 1000) {
         lastUpdateTime_ = currentTime;
+
+        // Define a custom gray color (RGB565: 0x8410)
+        const uint16_t GRAY = 0x8410;
+
+        // Draw 12H / 24H indicator at the top
+        tft_.setTextSize(1);
+        int indicatorY = 2;
+        int indicatorX = 52; // Centered for 160px wide screen
+        // Draw "12H / 24H" with active mode white, inactive gray
+        if (timeData.is24HourFormat) {
+            tft_.setTextColor(GRAY, ST77XX_BLACK); tft_.setCursor(indicatorX, indicatorY); tft_.print("12H");
+            tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); tft_.setCursor(indicatorX + 24, indicatorY); tft_.print("/");
+            tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); tft_.setCursor(indicatorX + 36, indicatorY); tft_.print("24H");
+            // No AM/PM in 24h mode
+            tft_.fillRect(indicatorX + 80, indicatorY, 24, 10, ST77XX_BLACK); // Clear area
+        } else {
+            tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); tft_.setCursor(indicatorX, indicatorY); tft_.print("12H");
+            tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); tft_.setCursor(indicatorX + 24, indicatorY); tft_.print("/");
+            tft_.setTextColor(GRAY, ST77XX_BLACK); tft_.setCursor(indicatorX + 36, indicatorY); tft_.print("24H");
+            // Show AM/PM
+            tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+            tft_.setCursor(indicatorX + 80, indicatorY);
+            tft_.print(timeData.isPm ? "PM" : "AM");
+        }
+
+        // Move times down to make room for indicator
+        int utcY = 18;    // Move UTC time down 2 pixels
+        int localY = 45;  // Move local time up 1 pixel
 
         // Display UTC time
         tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
         tft_.setTextSize(2);
-        tft_.setCursor(2, 6);
+        tft_.setCursor(2, utcY);
         tft_.print("UTC:");
         tft_.setTextColor(ST77XX_CYAN, ST77XX_BLACK);
-        tft_.setCursor(60, 6);
+        tft_.setCursor(60, utcY);
         char timeStr[10];
         sprintf(timeStr, "%02d:%02d:%02d", timeData.utcHours, timeData.utcMinutes, timeData.utcSeconds);
         tft_.print(timeStr);
@@ -68,10 +97,10 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
         // Display Local time
         tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
         tft_.setTextSize(2);
-        tft_.setCursor(2, 36);
+        tft_.setCursor(2, localY);
         tft_.print("LOC:");
         tft_.setTextColor(ST77XX_GREEN, ST77XX_BLACK);
-        tft_.setCursor(60, 36);
+        tft_.setCursor(60, localY);
         sprintf(timeStr, "%02d:%02d:%02d", timeData.localHours, timeData.localMinutes, timeData.localSeconds);
         tft_.print(timeStr);
 
@@ -99,11 +128,11 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
             sprintf(statusStr, "GPS: UNKNOWN (%d) %s", timeData.satelliteCount, lockStr);
         }
 
-        // Move status line up to fit below time displays
-        tft_.fillRect(0, 64, 160, 16, ST77XX_BLACK);
+        // Move status line up 1 more pixel
+        tft_.fillRect(0, 71, 160, 16, ST77XX_BLACK);
         tft_.setTextColor(statusColor);
         tft_.setTextSize(1);
-        tft_.setCursor(0, 66);
+        tft_.setCursor(0, 73);
         tft_.print(statusStr);
 
         updated = true;

@@ -22,6 +22,10 @@ public:
     // Timezone offset management
     void incrementTimezoneOffset();  // Increment timezone offset (0-23, wrapping)
 
+    // Time format management
+    void toggleTimeFormat();
+    bool getIs24HourFormat() const;
+
     // Signal strength assessment
     const char* getSignalStrength(double hdop, int satellites);
 
@@ -33,6 +37,7 @@ private:
     TinyGPSPlus gps_;  // TinyGPS++ object
     ConfigPersistence& config_;
     int timezoneOffsetHours_;
+    bool is24HourFormat_;
 
     void processGPSData();  // Process parsed GPS data from TinyGPS++
 };

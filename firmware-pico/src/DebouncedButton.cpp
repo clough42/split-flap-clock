@@ -53,6 +53,7 @@ void DebouncedButton::update() {
         if ((currentTime - buttonDownTime_) >= longPressMs_) {
             longPressDetected_ = true;
             shortPressDetected_ = false; // Prevent short press
+            waitingForRelease_ = false; // Prevent repeated long press until release
         }
     }
 }
