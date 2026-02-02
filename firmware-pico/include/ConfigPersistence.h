@@ -6,6 +6,7 @@ class ConfigPersistence {
 public:
     ConfigPersistence();
     void initialize();
+    
     int getTimezoneOffset();
     void setTimezoneOffset(int offset);
 
