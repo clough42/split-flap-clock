@@ -1,12 +1,12 @@
 #include <EEPROM.h>
 
 #include "GPSProcessor.h"
-#include "FlapDisplay.h"
+#include "MechanicalDisplay.h"
 #include "LEDController.h"
 #include "TFTDisplay.h"
 #include "Configuration.h"
 
-GPSProcessor::GPSProcessor(ConfigPersistence& config, FlapDisplay& timeDisplay, TFTDisplay& displayController, LEDController& ledController, HardwareSerial& serial)
+GPSProcessor::GPSProcessor(ConfigPersistence& config, MechanicalDisplay& timeDisplay, TFTDisplay& displayController, LEDController& ledController, HardwareSerial& serial)
     : config_(config), timeDisplay_(timeDisplay), displayController_(displayController), ledController_(ledController), serial_(serial), is24HourFormat_(true) {
 }
 
@@ -37,7 +37,7 @@ void GPSProcessor::initialize() {
 void GPSProcessor::toggleTimeFormat() {
     is24HourFormat_ = !is24HourFormat_;
     config_.setIs24HourFormat(is24HourFormat_);
-    processGPSData(); // Update display and flaps
+    processGPSData(); // Update display
 }
 
 bool GPSProcessor::getIs24HourFormat() const {
@@ -109,7 +109,7 @@ void GPSProcessor::processGPSData() {
         int displayLocalHours = localHours;
         bool isPM = false;
         if (!is24HourFormat_) {
-            // Convert to 12-hour format for display/flap
+            // Convert to 12-hour format for display
             if (displayLocalHours == 0) {
                 displayLocalHours = 12;
                 isPM = false;

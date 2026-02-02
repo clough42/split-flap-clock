@@ -1,11 +1,11 @@
-#ifndef FLAP_DISPLAY_H
-#define FLAP_DISPLAY_H
+#ifndef MECHANICAL_DISPLAY_H
+#define MECHANICAL_DISPLAY_H
 
 #include <Arduino.h>
 #include "StepperController.h"
 #include "TimeData.h"
 
-class FlapDisplay {
+class MechanicalDisplay {
 private:
     StepperController& hoursTens_;
     StepperController& hoursOnes_;
@@ -18,7 +18,8 @@ private:
     void homeAllMotors();
 
 public:
-    FlapDisplay(StepperController& hoursTens,
+    MechanicalDisplay
+(StepperController& hoursTens,
                StepperController& hoursOnes,
                StepperController& minutesTens,
                StepperController& minutesOnes,
@@ -32,4 +33,4 @@ public:
     void runMotors();
 };
 
-#endif // FLAP_DISPLAY_H
+#endif // MECHANICAL_DISPLAY_H

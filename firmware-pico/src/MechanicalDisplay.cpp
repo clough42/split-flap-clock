@@ -1,6 +1,6 @@
-#include "FlapDisplay.h"
+#include "MechanicalDisplay.h"
 
-FlapDisplay::FlapDisplay(StepperController& hoursTens,
+MechanicalDisplay::MechanicalDisplay(StepperController& hoursTens,
                                                 StepperController& hoursOnes,
                                                 StepperController& minutesTens,
                                                 StepperController& minutesOnes,
@@ -12,7 +12,7 @@ FlapDisplay::FlapDisplay(StepperController& hoursTens,
             minutesTens_(minutesTens), minutesOnes_(minutesOnes), secondsTens_(secondsTens), secondsOnes_(secondsOnes), enablePin_(enablePin), debugPin_(debugPin) {
 }
 
-void FlapDisplay::initialize() {
+void MechanicalDisplay::initialize() {
     // Initialize shared motor enable pin (active low)
     pinMode(enablePin_, OUTPUT);
     digitalWrite(enablePin_, LOW);  // Enable all motors
@@ -33,7 +33,7 @@ void FlapDisplay::initialize() {
     homeAllMotors();
 }
 
-void FlapDisplay::homeAllMotors() {
+void MechanicalDisplay::homeAllMotors() {
     bool allHomed = false;
     do {
         allHomed = true;
@@ -47,7 +47,7 @@ void FlapDisplay::homeAllMotors() {
     } while (!allHomed);
 }
 
-void FlapDisplay::updateTime(const TimeData& timeData) {
+void MechanicalDisplay::updateTime(const TimeData& timeData) {
     // Only update if time is valid
     if (timeData.validTime) {
         // the motors are running in the other core, so we need to pause it before making updates
@@ -62,7 +62,7 @@ void FlapDisplay::updateTime(const TimeData& timeData) {
     }
 }
 
-void FlapDisplay::runMotors() {
+void MechanicalDisplay::runMotors() {
     digitalWrite(debugPin_, HIGH);  // Start timing measurement
     
     hoursTens_.run();

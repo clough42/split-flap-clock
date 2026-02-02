@@ -6,14 +6,14 @@
 #include "TimeData.h"
 
 // Forward declarations
-class FlapDisplay;
+class MechanicalDisplay;
 class LEDController;
 class TFTDisplay;
 #include "ConfigPersistence.h"
 
 class GPSProcessor {
 public:
-    GPSProcessor(ConfigPersistence& config, FlapDisplay& timeDisplay, TFTDisplay& tftDisplay, LEDController& ledController, HardwareSerial& serial);
+    GPSProcessor(ConfigPersistence& config, MechanicalDisplay& timeDisplay, TFTDisplay& tftDisplay, LEDController& ledController, HardwareSerial& serial);
 
     void initialize();
     void processIncomingData();
@@ -30,7 +30,7 @@ public:
     const char* getSignalStrength(double hdop, int satellites);
 
 private:
-    FlapDisplay& timeDisplay_;
+    MechanicalDisplay& timeDisplay_;
     LEDController& ledController_;
     TFTDisplay& displayController_;
     HardwareSerial& serial_;

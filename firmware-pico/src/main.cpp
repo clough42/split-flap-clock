@@ -6,7 +6,7 @@
 
 // Include our classes
 #include "StepperController.h"
-#include "FlapDisplay.h"
+#include "MechanicalDisplay.h"
 #include "GPSProcessor.h"
 #include "LEDController.h"
 #include "TFTDisplay.h"
@@ -35,13 +35,13 @@ StepperController motorSecondsOnes(secondsOnes, STEPS_PER_POSITION, SECONDS_ONES
 // LED controller (no dependencies)
 LEDController ledController(LED_PIN);
 
-// Flap display (depends on stepper controllers)
-FlapDisplay flapDisplay(motorHoursTens, motorHoursOnes, motorMinutesTens, motorMinutesOnes, motorSecondsTens, motorSecondsOnes, ENABLE_PIN, DEBUG_PIN);
+// Mechanical display (depends on stepper controllers)
+MechanicalDisplay mechanicalDisplay(motorHoursTens, motorHoursOnes, motorMinutesTens, motorMinutesOnes, motorSecondsTens, motorSecondsOnes, ENABLE_PIN, DEBUG_PIN);
 
 TFTDisplay tftDisplay(TFT_CS_PIN, TFT_DC_PIN, TFT_RST_PIN);
 
 // GPS processor with real dependencies
-GPSProcessor gpsProcessor(configPersistence, flapDisplay, tftDisplay, ledController, Serial1);
+GPSProcessor gpsProcessor(configPersistence, mechanicalDisplay, tftDisplay, ledController, Serial1);
 
 // Timezone button with debouncing
 DebouncedButton configButton(TIMEZONE_BUTTON_PIN, BUTTON_DEBOUNCE_MS, BUTTON_LONG_PRESS_MS);
@@ -52,7 +52,7 @@ void setup() {
 
     // Initialize serial communication for console output
     Serial.begin(SERIAL_BAUD_RATE);
-    Serial.println("GPS Split-Flap Clock Started");
+    Serial.println("GPS Mechanical Clock Started");
     
     // Select pins for GPS UART
     Serial1.setRX(GPS_RX_PIN);
@@ -67,7 +67,7 @@ void setup() {
     configPersistence.initialize();
     configButton.initialize();
     ledController.initialize();
-    flapDisplay.initialize();
+    mechanicalDisplay.initialize();
     tftDisplay.initialize();
     gpsProcessor.initialize();
     
@@ -99,5 +99,5 @@ void loop() {
 
 void loop1() {
     // Service the stepper motors
-    flapDisplay.runMotors();
+    mechanicalDisplay.runMotors();
 }
