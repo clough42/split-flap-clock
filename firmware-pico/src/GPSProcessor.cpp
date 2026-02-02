@@ -77,20 +77,12 @@ const char* GPSProcessor::getSignalStrength(double hdop, int satellites) {
 }
 
 void GPSProcessor::processGPSData() {
-    // Always check for satellite data, even if time isn't valid yet
     int satelliteCount = gps_.satellites.value();
     bool timeIsValid = gps_.time.isValid() && satelliteCount >= 3;
     
-    // Check if GPS status has changed since last update
-    static int lastSatelliteCount = -1;
-    static bool lastTimeValid = false;
-    bool statusChanged = (satelliteCount != lastSatelliteCount) || (timeIsValid != lastTimeValid);
-    
-    // Always update display with current GPS status
     double hdop = gps_.hdop.hdop();
     const char* signalStrength = getSignalStrength(hdop, satelliteCount);
     TimeData timeData;
-
 
     if (timeIsValid) {
         // Extract valid time components
@@ -143,14 +135,14 @@ void GPSProcessor::processGPSData() {
         timeData = {0, 0, 0, 0, 0, 0, satelliteCount, false, signalStrength, is24HourFormat_, false};
     }
 
-    // Always update display with current status
+    // Always update display with current time
     displayController_.updateTime(timeData);
     
-    // Only print status when something changes
-    if (statusChanged) {
-        double hdop = gps_.hdop.hdop();
-        const char* signalStrength = getSignalStrength(hdop, satelliteCount);
-        
+    // Debug output (limit to once per second)
+    static unsigned long lastDebugTime = 0;
+    unsigned long currentMillis = millis();
+    if (currentMillis - lastDebugTime >= 1000) {
+        lastDebugTime = currentMillis;
         if (timeIsValid) {
             Serial.print("GPS Time Valid - Satellites: ");
             Serial.print(satelliteCount);
@@ -164,9 +156,5 @@ void GPSProcessor::processGPSData() {
             Serial.print(" | Signal: ");
             Serial.println(signalStrength);
         }
-        
-        // Update static variables to track changes
-        lastSatelliteCount = satelliteCount;
-        lastTimeValid = timeIsValid;
     }
 }
