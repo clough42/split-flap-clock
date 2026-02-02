@@ -4,6 +4,8 @@
 #include "Configuration.h"
 #include "LEDController.h"
 
+#define SWAP_RB_565(val) ( ((val & 0x1F) << 11) | (val & 0x7E0) | ((val >> 11) & 0x1F) )
+
 // For ST7735, use Adafruit_ST7735(tftCS, tftDC, tftRST)
 TFTDisplay::TFTDisplay(int tftCS, int tftDC, int tftRST)
     : tft_(tftCS, tftDC, tftRST) {
@@ -22,7 +24,7 @@ void TFTDisplay::initialize() {
 
 void TFTDisplay::showHomingScreen() {
     drawBackground();
-    tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); // Orange text
+    tft_.setTextColor(SWAP_RB_565(ST77XX_RED), ST77XX_BLACK);
     tft_.setTextSize(2);
     // Centered horizontally, vertically
     int16_t x1, y1;
@@ -38,7 +40,7 @@ void TFTDisplay::showHomingScreen() {
 
 void TFTDisplay::showWaitingForGpsScreen() {
     drawBackground();
-    tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); // Orange text
+    tft_.setTextColor(SWAP_RB_565(ST77XX_RED), ST77XX_BLACK);
     tft_.setTextSize(2); // Match HOMING message size
     // Centered horizontally, vertically
     const char* msg1 = "WAITING";
@@ -119,7 +121,7 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
             tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK); tft_.setCursor(indicatorX + 24, indicatorY); tft_.print("/");
             tft_.setTextColor(GRAY, ST77XX_BLACK); tft_.setCursor(indicatorX + 36, indicatorY); tft_.print("24H");
             // Show AM/PM
-            tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+            tft_.setTextColor(SWAP_RB_565(ST77XX_WHITE), ST77XX_BLACK);
             tft_.setCursor(indicatorX + 80, indicatorY);
             tft_.print(timeData.isPm ? "PM" : "AM");
         }
@@ -133,7 +135,7 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
         tft_.setTextSize(2);
         tft_.setCursor(2, utcY);
         tft_.print("UTC:");
-        tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+        tft_.setTextColor(SWAP_RB_565(ST77XX_CYAN), ST77XX_BLACK);
         tft_.setCursor(60, utcY);
         char timeStr[10];
         sprintf(timeStr, "%02d:%02d:%02d", timeData.utcHours, timeData.utcMinutes, timeData.utcSeconds);
@@ -144,7 +146,7 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
         tft_.setTextSize(2);
         tft_.setCursor(2, localY);
         tft_.print("LOC:");
-        tft_.setTextColor(ST77XX_WHITE, ST77XX_BLACK);
+        tft_.setTextColor(SWAP_RB_565(ST77XX_WHITE), ST77XX_BLACK);
         tft_.setCursor(60, localY);
         sprintf(timeStr, "%02d:%02d:%02d", timeData.localHours, timeData.localMinutes, timeData.localSeconds);
         tft_.print(timeStr);
@@ -158,12 +160,12 @@ void TFTDisplay::updateTime(const TimeData& timeData) {
         // Color code based on signal strength (red/blue swapped for BGR display)
         uint16_t statusColor = ST77XX_WHITE;
         if (timeData.signalStrength) {
-            if (strcmp(timeData.signalStrength, "EXCELLENT") == 0) statusColor = 0x1F04; // true GREEN
-            else if (strcmp(timeData.signalStrength, "GOOD") == 0) statusColor = 0xF81F; // true CYAN
-            else if (strcmp(timeData.signalStrength, "MODERATE") == 0) statusColor = 0xE0FF; // true YELLOW
-            else if (strcmp(timeData.signalStrength, "FAIR") == 0) statusColor = 0xF800; // true MAGENTA
-            else if (strcmp(timeData.signalStrength, "POOR") == 0) statusColor = 0x001F; // true RED
-            else if (strcmp(timeData.signalStrength, "NO SIGNAL") == 0) statusColor = 0x001F; // true RED
+            if (strcmp(timeData.signalStrength, "EXCELLENT") == 0) statusColor = SWAP_RB_565(ST77XX_GREEN) ;
+            else if (strcmp(timeData.signalStrength, "GOOD") == 0) statusColor = SWAP_RB_565(ST77XX_CYAN);
+            else if (strcmp(timeData.signalStrength, "MODERATE") == 0) statusColor = SWAP_RB_565(ST77XX_YELLOW);
+            else if (strcmp(timeData.signalStrength, "FAIR") == 0) statusColor = SWAP_RB_565(ST77XX_ORANGE);
+            else if (strcmp(timeData.signalStrength, "POOR") == 0) statusColor = SWAP_RB_565(ST77XX_RED);
+            else if (strcmp(timeData.signalStrength, "NO SIGNAL") == 0) statusColor = SWAP_RB_565(ST77XX_RED);
         }
 
         char* lockStr = timeData.validTime ? (char *)"locked" : (char *)"unlocked";
