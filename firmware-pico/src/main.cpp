@@ -67,8 +67,12 @@ void setup() {
     configPersistence.initialize();
     configButton.initialize();
     ledController.initialize();
-    mechanicalDisplay.initialize();
     tftDisplay.initialize();
+
+    tftDisplay.showHomingScreen();
+    mechanicalDisplay.initialize();
+
+    tftDisplay.showWaitingForGpsScreen();
     gpsProcessor.initialize();
     
     // release core 1 for motor control

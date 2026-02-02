@@ -13,7 +13,8 @@ private:
     Adafruit_ST7735 tft_;
     TimeData lastDisplayedTime_;
     unsigned long lastUpdateTime_;
-    
+    bool needsClear_ = true;
+
     void drawTimeDisplay();
     void drawBackground();
     bool timeChanged(const TimeData& newTime);
@@ -21,9 +22,13 @@ private:
     
 public:
     TFTDisplay(int tftCS, int tftDC, int tftRST);
-    
+
     void initialize();
     void updateTime(const TimeData& timeData);
+
+    // Utility screens
+    void showHomingScreen();
+    void showWaitingForGpsScreen();
 };
 
 #endif // TFT_DISPLAY_H
