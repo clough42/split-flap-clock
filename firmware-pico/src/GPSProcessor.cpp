@@ -75,6 +75,7 @@ const char* GPSProcessor::getSignalStrength(double hdop, int satellites) {
         return "POOR";
     }
 }
+
 void GPSProcessor::processGPSData() {
     // Always check for satellite data, even if time isn't valid yet
     int satelliteCount = gps_.satellites.value();
