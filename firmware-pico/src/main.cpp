@@ -88,11 +88,11 @@ void setup1() {
 // Main loop on core 0
 void loop() {
     // Handle config button
-    configButton.update();
-    if (configButton.wasShortPressed()) {
+    DebouncedButton::PressType pressType = configButton.checkButton();
+    if (pressType == DebouncedButton::Short) {
         gpsProcessor.incrementTimezoneOffset();
     }
-    if (configButton.wasLongPressed()) {
+    if (pressType == DebouncedButton::Long) {
         gpsProcessor.toggleTimeFormat();
     }
 
